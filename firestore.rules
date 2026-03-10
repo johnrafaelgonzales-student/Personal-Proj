@@ -116,7 +116,8 @@ service cloud.firestore {
      * @principle Enforces self-creation for bootstrapping and role-based access for management.
      */
     match /admins/{adminId} {
-      allow get, list: if isAdmin();
+      allow get: if isOwner(adminId) || isAdmin();
+      allow list: if isAdmin();
       allow create: if isOwner(adminId) && hasValidAdminCreateData(adminId);
       allow update: if (isOwner(adminId) || isAdmin()) && resource != null && isImmutableAdminData();
       allow delete: if (isOwner(adminId) || isAdmin()) && resource != null;
