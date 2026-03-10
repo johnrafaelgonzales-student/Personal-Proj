@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   BookCopy,
   BookOpenCheck,
@@ -44,17 +44,18 @@ export default function LibFlowApp() {
   const { user, loading: userLoading } = useUser();
   const router = useRouter();
 
-  if (userLoading) {
+  useEffect(() => {
+    if (!userLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, userLoading, router]);
+
+  if (userLoading || !user) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
-  }
-
-  if (!user) {
-    router.push('/login');
-    return null;
   }
 
   const renderContent = () => {
