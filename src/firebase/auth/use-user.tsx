@@ -29,27 +29,39 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const db = getFirestore(auth.app);
-        
-        // Check admin collection first
-        let userDoc = await getDoc(doc(db, 'admins', firebaseUser.uid));
-        let role: 'admin' | 'visitor' | undefined = undefined;
+        try {
+          const db = getFirestore(auth.app);
+          const adminRef = doc(db, 'admins', firebaseUser.uid);
+          const visitorRef = doc(db, 'registeredVisitors', firebaseUser.uid);
 
-        if (userDoc.exists()) {
-          role = 'admin';
-        } else {
-          // Check registeredVisitors collection if not found in admin
-          userDoc = await getDoc(doc(db, 'registeredVisitors', firebaseUser.uid));
-          if (userDoc.exists()) {
+          const [adminResult, visitorResult] = await Promise.allSettled([
+            getDoc(adminRef),
+            getDoc(visitorRef),
+          ]);
+
+          let role: 'admin' | 'visitor' | undefined = undefined;
+
+          if (adminResult.status === 'fulfilled' && adminResult.value.exists()) {
+            role = 'admin';
+          } else if (
+            visitorResult.status === 'fulfilled' &&
+            visitorResult.value.exists()
+          ) {
             role = 'visitor';
           }
+
+          setUser({ ...firebaseUser, role });
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+          // Set user without a role if fetching fails
+          setUser(firebaseUser);
+        } finally {
+          setLoading(false);
         }
-        
-        setUser({ ...firebaseUser, role });
       } else {
         setUser(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
