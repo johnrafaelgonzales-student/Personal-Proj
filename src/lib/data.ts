@@ -41,6 +41,6 @@ export const mockVisitors = generateMockVisitors(150);
 
 export const mockUser = {
     name: 'Jane Doe',
-    email: 'jane.doe@neu.edu',
+    email: 'jane.doe@neu.edu.ph',
     avatarUrl: 'https://picsum.photos/seed/librarian/100/100',
 };

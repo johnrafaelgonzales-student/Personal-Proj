@@ -29,9 +29,14 @@ import { useToast } from '@/hooks/use-toast';
 import { signIn } from '@/lib/auth';
 
 const formSchema = z.object({
-  email: z.string().email({
-    message: 'Please enter a valid email address.',
-  }),
+  email: z
+    .string()
+    .email({
+      message: 'Please enter a valid email address.',
+    })
+    .refine((email) => email.endsWith('@neu.edu.ph'), {
+      message: 'Only institutional emails (@neu.edu.ph) are allowed.',
+    }),
   password: z.string().min(6, {
     message: 'Password must be at least 6 characters.',
   }),
@@ -79,7 +84,7 @@ export default function LoginPage() {
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account.
+          Enter your institutional email below to login to your account.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -94,7 +99,7 @@ export default function LoginPage() {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="m@example.com"
+                      placeholder="juan.delacruz@neu.edu.ph"
                       {...field}
                     />
                   </FormControl>

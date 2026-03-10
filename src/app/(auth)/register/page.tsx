@@ -37,9 +37,14 @@ import { signUp } from '@/lib/auth';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-  email: z.string().email({
-    message: 'Please enter a valid email address.',
-  }),
+  email: z
+    .string()
+    .email({
+      message: 'Please enter a valid email address.',
+    })
+    .refine((email) => email.endsWith('@neu.edu.ph'), {
+      message: 'Only institutional emails (@neu.edu.ph) are allowed.',
+    }),
   password: z.string().min(6, {
     message: 'Password must be at least 6 characters.',
   }),
@@ -91,7 +96,7 @@ export default function RegisterPage() {
       <CardHeader>
         <CardTitle className="text-2xl">Sign Up</CardTitle>
         <CardDescription>
-          Create an account to get started.
+          Create an account to get started. Use your institutional email.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -104,7 +109,7 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                    <Input placeholder="Juan Dela Cruz" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -119,7 +124,7 @@ export default function RegisterPage() {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="m@example.com"
+                      placeholder="juan.delacruz@neu.edu.ph"
                       {...field}
                     />
                   </FormControl>

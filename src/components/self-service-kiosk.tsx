@@ -27,11 +27,11 @@ export function SelfServiceKiosk() {
     setState('loading');
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    if (action === 'email' && !email.endsWith('@neu.edu')) {
+    if (action === 'email' && !email.endsWith('@neu.edu.ph')) {
         toast({
             variant: 'destructive',
             title: 'Invalid Email',
-            description: 'Please use a valid institutional email (@neu.edu).',
+            description: 'Please use a valid institutional email (@neu.edu.ph).',
         });
         setState('email');
         return;
@@ -78,7 +78,7 @@ export function SelfServiceKiosk() {
             <div className="flex flex-col items-center justify-center space-y-6 p-8">
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label htmlFor="email">Institutional Email</Label>
-                    <Input type="email" id="email" placeholder="your.name@neu.edu" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Input type="email" id="email" placeholder="your.name@neu.edu.ph" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
                 <Button onClick={() => handleAction('email')} className="w-full max-w-sm">
                     Proceed <ArrowRight className="ml-2 h-4 w-4" />
