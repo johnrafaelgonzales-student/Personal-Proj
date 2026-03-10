@@ -9,6 +9,7 @@ import {
   ScanLine,
   Settings,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 import {
   SidebarProvider,
@@ -27,6 +28,8 @@ import { ManualEntryForm } from '@/components/manual-entry-form';
 import { DashboardOverview } from '@/components/dashboard-overview';
 import { VisitorLogTable } from '@/components/visitor-log-table';
 import { SelfServiceKiosk } from '@/components/self-service-kiosk';
+import { useUser } from '@/firebase/auth/use-user';
+import { Loader2 } from 'lucide-react';
 
 type View = 'dashboard' | 'log' | 'kiosk';
 
@@ -38,6 +41,21 @@ const viewTitles: Record<View, string> = {
 
 export default function LibFlowApp() {
   const [activeView, setActiveView] = useState<View>('dashboard');
+  const { user, loading: userLoading } = useUser();
+  const router = useRouter();
+
+  if (userLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    router.push('/login');
+    return null;
+  }
 
   const renderContent = () => {
     switch (activeView) {

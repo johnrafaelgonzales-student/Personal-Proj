@@ -1,0 +1,158 @@
+/**
+ * Core Philosophy: This ruleset implements a strict role-based access control system
+ * separating users into two primary roles: 'Admins' and 'RegisteredVisitors'.
+ * A user's role is determined by the existence of their profile document in a
+ * dedicated top-level collection (/admins/{uid} or /registeredVisitors/{uid}).
+ * Admins are granted broad permissions to manage all data, while Visitors are
+ * restricted to managing their own profile and logging their own entries.
+ *
+ * Data Structure: The database uses a flat, top-level collection structure to
+ * maximize query performance and simplify security logic. The main collections are:
+ * - /admins: Stores administrator profiles, where the document ID is the admin's UID.
+ * - /registeredVisitors: Stores visitor profiles, where the document ID is the visitor's UID.
+ * - /visitorEntries: A comprehensive log of all entries, created by either admins or visitors.
+ *
+ * Key Security Decisions:
+ * - Role by Existence: A user is considered an 'Admin' if a document exists at
+ *   /admins/{request.auth.uid}. This is a highly performant check that avoids document reads.
+ * - Admin Supremacy: Authenticated Admins have full CRUD (Create, Read, Update, Delete)
+ *   permissions across all collections for management and reporting purposes.
+ * - Visitor Self-Service: Registered Visitors can create and manage their own
+ *   profile document and can create new log entries for themselves, but cannot view or
+ *   edit the entries of others or the full log.
+ * - No Public Listing: Listing users (admins or visitors) is restricted to Admins only.
+ *   The visitor entry log is also only listable by Admins.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ----------------------------------------------------------------------
+    // Helper Functions
+    // ----------------------------------------------------------------------
+
+    /**
+     * Checks if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the authenticated user's UID matches the provided userId.
+     * This is the primary function for enforcing document ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks if the user has an Admin role by verifying the existence
+     * of their profile in the /admins collection. This is a fast, non-billable read.
+     */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    /**
+     * Checks if the user is a Registered Visitor by verifying the existence
+     * of their profile in the /registeredVisitors collection.
+     */
+    function isRegisteredVisitor() {
+      return isSignedIn() && exists(/databases/$(database)/documents/registeredVisitors/$(request.auth.uid));
+    }
+    
+    /**
+     * Validates that the internal 'id' field of a new Admin document
+     * matches the document's ID (which is the user's UID).
+     */
+    function hasValidAdminCreateData(adminId) {
+      return request.resource.data.id == adminId;
+    }
+
+    /**
+     * Enforces that the internal 'id' field of an Admin document is immutable.
+     */
+    function isImmutableAdminData() {
+        return request.resource.data.id == resource.data.id;
+    }
+
+    /**
+     * Validates that the internal 'id' of a new RegisteredVisitor document
+     * matches the document's ID (which is the user's UID).
+     */
+    function hasValidVisitorCreateData(registeredVisitorId) {
+      return request.resource.data.id == registeredVisitorId;
+    }
+
+    /**
+     * Enforces that the internal 'id' field of a RegisteredVisitor document is immutable.
+     */
+    function isImmutableVisitorData() {
+        return request.resource.data.id == resource.data.id;
+    }
+
+    /**
+     * Validates the authorship of a new VisitorEntry document.
+     * An entry must be logged by an Admin or by a Registered Visitor for themselves.
+     */
+    function isValidVisitorEntryCreate() {
+        let createdByAdmin = isAdmin() && request.resource.data.loggedByAdminUserId == request.auth.uid;
+        let createdByVisitor = isRegisteredVisitor() && request.resource.data.registeredVisitorId == request.auth.uid;
+        return createdByAdmin || createdByVisitor;
+    }
+
+    // ----------------------------------------------------------------------
+    // Collection Rules
+    // ----------------------------------------------------------------------
+
+    /**
+     * @description Manages administrative user profiles. Admins can manage all profiles,
+     *   while a new user can create their own profile to bootstrap the system.
+     * @path /admins/{adminId}
+     * @allow (create) A new user (auth.uid: 'new_admin_xyz') can create their own doc at /admins/new_admin_xyz.
+     * @allow (get) An existing admin (auth.uid: 'admin_abc') can read any admin's profile.
+     * @deny (list) A non-admin user cannot list all admin profiles.
+     * @principle Enforces self-creation for bootstrapping and role-based access for management.
+     */
+    match /admins/{adminId} {
+      allow get, list: if isAdmin();
+      allow create: if isOwner(adminId) && hasValidAdminCreateData(adminId);
+      allow update: if (isOwner(adminId) || isAdmin()) && resource != null && isImmutableAdminData();
+      allow delete: if (isOwner(adminId) || isAdmin()) && resource != null;
+    }
+
+    /**
+     * @description Manages registered visitor profiles. Visitors can manage their own profile,
+     *   and Admins can manage any visitor profile.
+     * @path /registeredVisitors/{registeredVisitorId}
+     * @allow (create) A new user (auth.uid: 'visitor_abc') can create their own profile at /registeredVisitors/visitor_abc.
+     * @allow (update) The owner 'visitor_abc' can update their own document.
+     * @deny (get) A visitor 'visitor_abc' cannot get the profile of 'visitor_xyz'.
+     * @principle Restricts access to a user's own data tree, but allows admin oversight.
+     */
+    match /registeredVisitors/{registeredVisitorId} {
+      allow get: if isOwner(registeredVisitorId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(registeredVisitorId) && hasValidVisitorCreateData(registeredVisitorId);
+      allow update: if (isOwner(registeredVisitorId) || isAdmin()) && resource != null && isImmutableVisitorData();
+      allow delete: if (isOwner(registeredVisitorId) || isAdmin()) && resource != null;
+    }
+
+    /**
+     * @description A log of all visitor entries. Can be read by Admins, and new entries can
+     *   be created by Admins or by a Registered Visitor for themselves.
+     * @path /visitorEntries/{visitorEntryId}
+     * @allow (create) A registered visitor can create an entry where `registeredVisitorId` is their own UID.
+     * @allow (list) An admin can list all visitor entries for reporting.
+     * @deny (get, list, update, delete) A registered visitor cannot read, modify, or delete any entry, including their own.
+     * @principle Segregates write access based on roles and ensures the integrity of log data by restricting modification to admins.
+     */
+    match /visitorEntries/{visitorEntryId} {
+      allow get, list: if isAdmin();
+      allow create: if isSignedIn() && isValidVisitorEntryCreate();
+      allow update: if isAdmin() && resource != null;
+      allow delete: if isAdmin() && resource != null;
+    }
+  }
+}
