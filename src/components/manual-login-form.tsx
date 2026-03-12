@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { addVisitorToStore } from '@/lib/data';
 
 const adminSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -48,12 +49,17 @@ export function ManualLoginForm() {
       console.log('Admin login attempt:', values);
       router.push('/dashboard');
     } else {
-      console.log('Visitor entry:', values);
+      const visitorValues = values as z.infer<typeof visitorSchema>;
+      console.log('Visitor entry:', visitorValues);
+
+      // Add visitor to our "database"
+      addVisitorToStore(visitorValues);
+
       toast({
         title: 'Entry Logged!',
-        description: `Welcome, ${(values as any).name}. Your visit has been recorded.`,
+        description: `Welcome, ${visitorValues.name}. Your visit has been recorded.`,
       });
-      router.push(`/visitor-dashboard?name=${encodeURIComponent((values as any).name)}`);
+      router.push(`/visitor-dashboard?name=${encodeURIComponent(visitorValues.name)}`);
     }
   }
 

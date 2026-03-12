@@ -44,3 +44,46 @@ export const mockUser = {
     email: 'kim.iglesia@neu.edu.ph',
     avatarUrl: 'https://picsum.photos/seed/librarian/100/100',
 };
+
+
+const VISITORS_STORAGE_KEY = 'libflow-visitors';
+
+export const getVisitorsFromStore = (): Visitor[] => {
+  if (typeof window === 'undefined') {
+    return mockVisitors;
+  }
+  try {
+    const storedVisitors = window.localStorage.getItem(VISITORS_STORAGE_KEY);
+    if (storedVisitors) {
+      const parsed = JSON.parse(storedVisitors) as any[];
+      const visitors = parsed.map(v => ({ ...v, entryTime: new Date(v.entryTime) }));
+      return visitors.sort((a, b) => b.entryTime.getTime() - a.entryTime.getTime());
+    } else {
+      window.localStorage.setItem(VISITORS_STORAGE_KEY, JSON.stringify(mockVisitors));
+      return mockVisitors;
+    }
+  } catch (error) {
+    console.error("Error reading from localStorage", error);
+    return mockVisitors;
+  }
+};
+
+export const addVisitorToStore = (visitorData: { name: string; purpose: VisitorPurpose }) => {
+    if (typeof window === 'undefined') return;
+    try {
+        const currentVisitors = getVisitorsFromStore();
+        const newVisitor: Visitor = {
+            id: `vis-${Date.now()}`,
+            name: visitorData.name,
+            purpose: visitorData.purpose,
+            entryTime: new Date(),
+            entryType: 'manual',
+            avatarUrl: `https://picsum.photos/seed/${encodeURIComponent(visitorData.name)}/100/100`,
+            college: getRandomElement(colleges)
+        };
+        const updatedVisitors = [newVisitor, ...currentVisitors];
+        window.localStorage.setItem(VISITORS_STORAGE_KEY, JSON.stringify(updatedVisitors));
+    } catch (error) {
+        console.error("Error writing to localStorage", error);
+    }
+};

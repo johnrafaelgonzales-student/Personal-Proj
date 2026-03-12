@@ -36,14 +36,25 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { mockVisitors } from '@/lib/data';
+import { getVisitorsFromStore } from '@/lib/data';
 import type { Visitor } from '@/lib/types';
 
 const PAGE_SIZE = 10;
 
 export function VisitorLogTable() {
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [data, setData] = React.useState<Visitor[]>(mockVisitors);
+  const [data, setData] = React.useState<Visitor[]>([]);
+
+  React.useEffect(() => {
+    const loadData = () => setData(getVisitorsFromStore());
+    loadData();
+
+    // Reload data when the window gets focus to see new entries from other tabs
+    window.addEventListener('focus', loadData);
+    return () => {
+      window.removeEventListener('focus', loadData);
+    };
+  }, []);
 
   const totalPages = Math.ceil(data.length / PAGE_SIZE);
   const startIndex = (currentPage - 1) * PAGE_SIZE;
@@ -154,7 +165,11 @@ export function VisitorLogTable() {
       <CardFooter>
         <div className="flex w-full items-center justify-between text-xs text-muted-foreground">
           <div>
-            Page {currentPage} of {totalPages}
+            Showing{' '}
+            <strong>
+              {Math.min(startIndex + 1, data.length)}-{Math.min(endIndex, data.length)}
+            </strong>{' '}
+            of <strong>{data.length}</strong> visitors
           </div>
           <div className="flex items-center gap-2">
             <Button
