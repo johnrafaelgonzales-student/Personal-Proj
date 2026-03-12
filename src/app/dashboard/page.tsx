@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import {
   BookCopy,
   BookOpenCheck,
   LayoutDashboard,
   PlusCircle,
-  ScanLine,
   Settings,
   Shield,
   User as UserIcon,
@@ -28,7 +28,6 @@ import { ManualEntryForm } from '@/components/manual-entry-form';
 import { AdminDashboard } from '@/components/admin-dashboard';
 import { VisitorDashboard } from '@/components/visitor-dashboard';
 import { VisitorLogTable } from '@/components/visitor-log-table';
-import { SelfServiceKiosk } from '@/components/self-service-kiosk';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Card,
@@ -46,18 +45,12 @@ const adminViewTitles: Record<AdminView, string> = {
 };
 
 // Visitor
-type VisitorView = 'dashboard' | 'kiosk';
-const visitorViewTitles: Record<VisitorView, string> = {
-  dashboard: 'Dashboard',
-  kiosk: 'Self-Service Kiosk',
-};
+const visitorViewTitle = 'Dashboard';
 
 type ViewMode = 'admin' | 'visitor';
 
 export default function DashboardPage() {
   const [activeAdminView, setActiveAdminView] = useState<AdminView>('dashboard');
-  const [activeVisitorView, setActiveVisitorView] =
-    useState<VisitorView>('dashboard');
   const [viewMode, setViewMode] = useState<ViewMode>('admin');
 
   const isAdmin = viewMode === 'admin';
@@ -74,31 +67,24 @@ export default function DashboardPage() {
       }
     }
     // Visitor
-    switch (activeVisitorView) {
-      case 'dashboard':
-        return <VisitorDashboard />;
-      case 'kiosk':
-        return <SelfServiceKiosk />;
-      default:
-        return <VisitorDashboard />;
-    }
+    return <VisitorDashboard />;
   };
 
   const getHeaderTitle = () => {
     if (isAdmin) {
       return adminViewTitles[activeAdminView];
     }
-    return visitorViewTitles[activeVisitorView];
+    return visitorViewTitle;
   };
 
   return (
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <BookOpenCheck className="size-6 text-primary" />
             <h1 className="text-lg font-semibold">LibFlow</h1>
-          </div>
+          </Link>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
@@ -127,20 +113,10 @@ export default function DashboardPage() {
               <>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    onClick={() => setActiveVisitorView('dashboard')}
-                    isActive={activeVisitorView === 'dashboard'}
+                    isActive={true} // Always active as it's the only view
                   >
                     <LayoutDashboard />
                     <span>Dashboard</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    onClick={() => setActiveVisitorView('kiosk')}
-                    isActive={activeVisitorView === 'kiosk'}
-                  >
-                    <ScanLine />
-                    <span>Self-Service</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </>
