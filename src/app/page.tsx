@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   BookCopy,
   BookOpenCheck,
@@ -8,8 +8,9 @@ import {
   PlusCircle,
   ScanLine,
   Settings,
+  Shield,
+  User as UserIcon,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 import {
   SidebarProvider,
@@ -23,14 +24,19 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { UserNav } from '@/components/user-nav';
 import { ManualEntryForm } from '@/components/manual-entry-form';
 import { AdminDashboard } from '@/components/admin-dashboard';
 import { VisitorDashboard } from '@/components/visitor-dashboard';
 import { VisitorLogTable } from '@/components/visitor-log-table';
 import { SelfServiceKiosk } from '@/components/self-service-kiosk';
-import { useUser } from '@/firebase/auth/use-user';
-import { Loader2 } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 // Admin
 type AdminView = 'dashboard' | 'log';
@@ -46,28 +52,15 @@ const visitorViewTitles: Record<VisitorView, string> = {
   kiosk: 'Self-Service Kiosk',
 };
 
+type ViewMode = 'admin' | 'visitor';
+
 export default function LibFlowApp() {
   const [activeAdminView, setActiveAdminView] = useState<AdminView>('dashboard');
   const [activeVisitorView, setActiveVisitorView] =
     useState<VisitorView>('dashboard');
-  const { user, loading: userLoading } = useUser();
-  const router = useRouter();
+  const [viewMode, setViewMode] = useState<ViewMode>('admin');
 
-  useEffect(() => {
-    if (!userLoading && !user) {
-      router.push('/login');
-    }
-  }, [user, userLoading, router]);
-
-  if (userLoading || !user) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
-  const isAdmin = user.role === 'admin';
+  const isAdmin = viewMode === 'admin';
 
   const renderContent = () => {
     if (isAdmin) {
@@ -177,10 +170,35 @@ export default function LibFlowApp() {
                 </Button>
               </ManualEntryForm>
             )}
-            <UserNav />
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle>Demonstration Mode</CardTitle>
+              <CardDescription>
+                Authentication is disabled. Switch between views to see the
+                different dashboards.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs
+                value={viewMode}
+                onValueChange={(value) => setViewMode(value as ViewMode)}
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="admin">
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin View
+                  </TabsTrigger>
+                  <TabsTrigger value="visitor">
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    Visitor View
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </CardContent>
+          </Card>
           {renderContent()}
         </main>
       </SidebarInset>
