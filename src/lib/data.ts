@@ -32,6 +32,7 @@ export const generateMockVisitors = (count: number): Visitor[] => {
       entryType: getRandomElement(entryTypes),
       avatarUrl: `https://picsum.photos/seed/user${(i % 5) + 1}/100/100`,
       college: getRandomElement(colleges),
+      blocked: false,
     });
   }
   return visitors.sort((a, b) => b.entryTime.getTime() - a.entryTime.getTime());
@@ -79,11 +80,30 @@ export const addVisitorToStore = (visitorData: { name: string; purpose: VisitorP
             entryTime: new Date(),
             entryType: 'manual',
             avatarUrl: `https://picsum.photos/seed/${encodeURIComponent(visitorData.name)}/100/100`,
-            college: getRandomElement(colleges)
+            college: getRandomElement(colleges),
+            blocked: false,
         };
         const updatedVisitors = [newVisitor, ...currentVisitors];
         window.localStorage.setItem(VISITORS_STORAGE_KEY, JSON.stringify(updatedVisitors));
     } catch (error) {
         console.error("Error writing to localStorage", error);
+    }
+};
+
+export const toggleVisitorBlockStatus = (visitorId: string): Visitor[] => {
+    if (typeof window === 'undefined') return [];
+    try {
+        const currentVisitors = getVisitorsFromStore();
+        const updatedVisitors = currentVisitors.map(visitor => {
+            if (visitor.id === visitorId) {
+                return { ...visitor, blocked: !visitor.blocked };
+            }
+            return visitor;
+        });
+        window.localStorage.setItem(VISITORS_STORAGE_KEY, JSON.stringify(updatedVisitors));
+        return updatedVisitors;
+    } catch (error) {
+        console.error("Error updating localStorage", error);
+        return getVisitorsFromStore();
     }
 };

@@ -9,4 +9,5 @@ export type Visitor = {
   entryType: EntryType;
   avatarUrl: string;
   college: string;
+  blocked?: boolean;
 };

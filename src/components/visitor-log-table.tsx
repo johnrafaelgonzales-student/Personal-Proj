@@ -9,6 +9,7 @@ import {
   FileWarning,
   Eye,
   Ban,
+  CheckCircle,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -36,14 +37,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { getVisitorsFromStore } from '@/lib/data';
+import { getVisitorsFromStore, toggleVisitorBlockStatus } from '@/lib/data';
 import type { Visitor } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 const PAGE_SIZE = 10;
 
 export function VisitorLogTable() {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [data, setData] = React.useState<Visitor[]>([]);
+  const { toast } = useToast();
 
   React.useEffect(() => {
     const loadData = () => setData(getVisitorsFromStore());
@@ -67,6 +70,21 @@ export function VisitorLogTable() {
 
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleToggleBlock = (
+    visitorId: string,
+    visitorName: string,
+    isBlocked: boolean
+  ) => {
+    const updatedVisitors = toggleVisitorBlockStatus(visitorId);
+    setData(updatedVisitors);
+    toast({
+      title: `Visitor ${isBlocked ? 'Unblocked' : 'Blocked'}`,
+      description: `${visitorName} has been ${
+        isBlocked ? 'unblocked' : 'blocked'
+      }.`,
+    });
   };
 
   return (
@@ -98,7 +116,10 @@ export function VisitorLogTable() {
           <TableBody>
             {currentData.length > 0 ? (
               currentData.map((visitor) => (
-                <TableRow key={visitor.id}>
+                <TableRow
+                  key={visitor.id}
+                  className={visitor.blocked ? 'bg-destructive/10' : ''}
+                >
                   <TableCell className="hidden sm:table-cell">
                     <Image
                       alt="Visitor avatar"
@@ -109,7 +130,14 @@ export function VisitorLogTable() {
                       data-ai-hint="person portrait"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{visitor.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      {visitor.name}
+                      {visitor.blocked && (
+                        <Badge variant="destructive">Blocked</Badge>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Badge variant="outline">{visitor.purpose}</Badge>
                   </TableCell>
@@ -134,12 +162,34 @@ export function VisitorLogTable() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View Details
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                            <Ban className="mr-2 h-4 w-4" />
-                            Block User
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleToggleBlock(
+                              visitor.id,
+                              visitor.name,
+                              !!visitor.blocked
+                            )
+                          }
+                          className={
+                            !visitor.blocked
+                              ? 'text-destructive focus:bg-destructive/10 focus:text-destructive'
+                              : 'focus:text-primary'
+                          }
+                        >
+                          {visitor.blocked ? (
+                            <>
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              <span>Unblock User</span>
+                            </>
+                          ) : (
+                            <>
+                              <Ban className="mr-2 h-4 w-4" />
+                              <span>Block User</span>
+                            </>
+                          )}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -167,7 +217,8 @@ export function VisitorLogTable() {
           <div>
             Showing{' '}
             <strong>
-              {Math.min(startIndex + 1, data.length)}-{Math.min(endIndex, data.length)}
+              {Math.min(startIndex + 1, data.length)}-
+              {Math.min(endIndex, data.length)}
             </strong>{' '}
             of <strong>{data.length}</strong> visitors
           </div>
