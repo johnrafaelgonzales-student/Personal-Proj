@@ -40,7 +40,7 @@ export const generateMockVisitors = (count: number): Visitor[] => {
 export const mockVisitors = generateMockVisitors(150);
 
 export const mockUser = {
-    name: 'Jane Doe',
-    email: 'jane.doe@neu.edu.ph',
+    name: 'Iglesia, Kim',
+    email: 'kim.iglesia@neu.edu.ph',
     avatarUrl: 'https://picsum.photos/seed/librarian/100/100',
 };

@@ -45,7 +45,7 @@ export default function VisitorDashboardPage() {
                     alt="Visitor Avatar"
                     data-ai-hint="person portrait"
                   />
-                  <AvatarFallback>{mockUser.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>IK</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
