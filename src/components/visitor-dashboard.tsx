@@ -3,37 +3,39 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
+import { mockVisitors } from '@/lib/data';
+import { VisitorHistoryTable } from './visitor-history-table';
 
 export function VisitorDashboard() {
-  // Using a mock user for demonstration purposes
-  const user = {
-      displayName: 'John Doe',
-      email: 'john.doe@neu.edu.ph',
-      photoURL: 'https://picsum.photos/seed/user1/100/100'
-  }
+  // Using the first mock user for demonstration to ensure history data is available.
+  const user = mockVisitors[0];
+  const userEmail = `${user.name.toLowerCase().replace(' ', '.')}@neu.edu.ph`;
 
   return (
     <div className="grid gap-4 md:gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Welcome, {user.displayName || 'Visitor'}!</CardTitle>
+          <CardTitle>Welcome, {user.name || 'Visitor'}!</CardTitle>
           <CardDescription>This is your personal dashboard.</CardDescription>
         </CardHeader>
         <CardContent className="flex items-center gap-4">
           <Avatar className="h-16 w-16">
-            {user.photoURL && (
-            <AvatarImage asChild src={user.photoURL}>
-                <Image src={user.photoURL} alt="user avatar" width={64} height={64} data-ai-hint="person portrait" />
+            {user.avatarUrl && (
+            <AvatarImage asChild src={user.avatarUrl}>
+                <Image src={user.avatarUrl} alt="user avatar" width={64} height={64} data-ai-hint="person portrait" />
             </AvatarImage>
             )}
-            <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
-              <p className="font-semibold">{user.displayName}</p>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
+              <p className="font-semibold">{user.name}</p>
+              <p className="text-sm text-muted-foreground">{userEmail}</p>
           </div>
         </CardContent>
       </Card>
+      
+      <VisitorHistoryTable />
+
       <Card>
         <CardHeader>
           <CardTitle>Log Your Visit</CardTitle>
