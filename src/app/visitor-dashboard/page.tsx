@@ -1,6 +1,8 @@
 'use client';
 
+import { Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { BookOpenCheck, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -21,7 +23,26 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export default function VisitorDashboardPage() {
+function VisitorDashboardContent() {
+  const searchParams = useSearchParams();
+  const name = searchParams.get('name') || mockUser.name;
+
+  const getInitials = (nameStr: string) => {
+    const cleanedName = nameStr.replace(',', '');
+    const parts = cleanedName.split(' ').filter(Boolean);
+    if (parts.length > 1) {
+      const firstInitial = parts[0][0] || '';
+      const lastInitial = parts[parts.length - 1][0] || '';
+      return `${firstInitial}${lastInitial}`.toUpperCase();
+    }
+    if (parts.length === 1 && parts[0].length > 1) {
+      return parts[0].substring(0, 2).toUpperCase();
+    }
+    return '??';
+  };
+
+  const initials = getInitials(name);
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
@@ -31,7 +52,7 @@ export default function VisitorDashboardPage() {
         </Link>
 
         <div className="flex items-center gap-4">
-          <span className="text-sm font-medium">{mockUser.name}</span>
+          <span className="text-sm font-medium">{name}</span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -45,7 +66,7 @@ export default function VisitorDashboardPage() {
                     alt="Visitor Avatar"
                     data-ai-hint="person portrait"
                   />
-                  <AvatarFallback>IK</AvatarFallback>
+                  <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -66,7 +87,7 @@ export default function VisitorDashboardPage() {
         <div className="space-y-4 pt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Welcome, {mockUser.name}!</CardTitle>
+              <CardTitle>Welcome, {name}!</CardTitle>
               <CardDescription>
                 Here's a summary of your recent library visits.
               </CardDescription>
@@ -76,5 +97,13 @@ export default function VisitorDashboardPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function VisitorDashboardPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VisitorDashboardContent />
+    </Suspense>
   );
 }
