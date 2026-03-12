@@ -14,10 +14,7 @@ export function LoginOptions() {
     if (role === 'admin') {
       router.push('/dashboard');
     } else {
-      // We don't have a visitor dashboard, just an entry log.
-      // For demo, we'll show a success message.
-      alert('Visitor RFID entry logged successfully!');
-      router.push('/');
+      router.push('/visitor-dashboard');
     }
   };
 

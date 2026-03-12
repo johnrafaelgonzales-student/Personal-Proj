@@ -53,7 +53,7 @@ export function ManualLoginForm() {
         title: 'Entry Logged!',
         description: `Welcome, ${(values as any).name}. Your visit has been recorded.`,
       });
-      router.push('/');
+      router.push('/visitor-dashboard');
     }
   }
 
