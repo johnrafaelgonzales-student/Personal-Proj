@@ -35,15 +35,31 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { colleges, offices } from '@/lib/data';
+import { addVisitorToStore, colleges, offices } from '@/lib/data';
 
 const formSchema = z.object({
-  name: z.string().min(2, {
-    message: 'Name must be at least 2 characters.',
-  }),
+  email: z
+    .string()
+    .email({ message: 'Please enter a valid email.' })
+    .refine((email) => email.endsWith('@neu.edu.ph'), {
+      message: 'Please use an institutional @neu.edu.ph email.',
+    }),
   purpose: z.enum(['Research', 'Study', 'Borrow/Return', 'Event', 'Other']),
   college: z.string({ required_error: 'Please select a college/office.' }),
 });
+
+const emailToName = (email: string): string => {
+  if (!email.includes('@')) return email;
+  const emailUser = email.split('@')[0];
+  const nameParts = emailUser
+    .split('.')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1));
+  if (nameParts.length > 1) {
+    const lastName = nameParts.pop();
+    return `${lastName}, ${nameParts.join(' ')}`;
+  }
+  return nameParts[0] || '';
+};
 
 export function ManualEntryForm({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
@@ -53,7 +69,7 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
+      email: '',
       purpose: 'Study',
       college: undefined,
     },
@@ -61,14 +77,22 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    
+    const derivedName = emailToName(values.email);
+    addVisitorToStore({
+      name: derivedName,
+      purpose: values.purpose,
+      college: values.college,
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     setIsSubmitting(false);
     setOpen(false);
     form.reset();
     toast({
       title: 'Success!',
-      description: `Visitor "${values.name}" from ${values.college} has been logged successfully.`,
+      description: `Visitor "${derivedName}" from ${values.college} has been logged successfully.`,
     });
   }
 
@@ -79,19 +103,26 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
         <DialogHeader>
           <DialogTitle>Manual Visitor Entry</DialogTitle>
           <DialogDescription>
-            Log a new visitor entry. The current date and time will be automatically recorded.
+            Log a new visitor entry. The current date and time will be
+            automatically recorded.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 py-4"
+          >
             <FormField
               control={form.control}
-              name="name"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Visitor Name</FormLabel>
+                  <FormLabel>Visitor Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., John Doe" {...field} />
+                    <Input
+                      placeholder="e.g., juan.delacruz@neu.edu.ph"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -115,7 +146,9 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
                     <SelectContent>
                       <SelectItem value="Research">Research</SelectItem>
                       <SelectItem value="Study">Study</SelectItem>
-                      <SelectItem value="Borrow/Return">Borrow/Return</SelectItem>
+                      <SelectItem value="Borrow/Return">
+                        Borrow/Return
+                      </SelectItem>
                       <SelectItem value="Event">Event</SelectItem>
                       <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
@@ -152,9 +185,9 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
                         <SelectGroup key={group}>
                           <SelectLabel>{group}</SelectLabel>
                           {officeList.map((office) => (
-                             <SelectItem key={office} value={office}>
-                               {office}
-                             </SelectItem>
+                            <SelectItem key={office} value={office}>
+                              {office}
+                            </SelectItem>
                           ))}
                         </SelectGroup>
                       ))}
