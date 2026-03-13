@@ -104,6 +104,7 @@ export function VisitorLogTable() {
               </TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Purpose</TableHead>
+              <TableHead className="hidden md:table-cell">College</TableHead>
               <TableHead className="hidden md:table-cell">Entry Type</TableHead>
               <TableHead className="hidden md:table-cell">
                 Entry Time
@@ -140,6 +141,9 @@ export function VisitorLogTable() {
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{visitor.purpose}</Badge>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {visitor.college}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
                     {visitor.entryType}
@@ -199,7 +203,7 @@ export function VisitorLogTable() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={6}
+                  colSpan={7}
                   className="h-24 text-center text-muted-foreground"
                 >
                   <div className="flex flex-col items-center gap-2">

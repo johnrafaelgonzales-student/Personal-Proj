@@ -34,11 +34,31 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 
+const colleges = [
+  'College of Accountancy',
+  'College of Agriculture',
+  'College of Arts and Sciences',
+  'College of Business Administration',
+  'College of Communication',
+  'College of Informatics and Computing Studies',
+  'College of Criminology',
+  'College of Education',
+  'College of Engineering and Architecture',
+  'College of Medical Technology',
+  'College of Midwifery',
+  'College of Music',
+  'College of Nursing',
+  'College of Physical Therapy',
+  'College of Respiratory Therapy',
+  'School of International Relations',
+];
+
 const formSchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
   }),
   purpose: z.enum(['Research', 'Study', 'Borrow/Return', 'Event', 'Other']),
+  college: z.string({ required_error: 'Please select a college.' }),
 });
 
 export function ManualEntryForm({ children }: { children: React.ReactNode }) {
@@ -51,6 +71,7 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
     defaultValues: {
       name: '',
       purpose: 'Study',
+      college: undefined,
     },
   });
 
@@ -63,7 +84,7 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
     form.reset();
     toast({
       title: 'Success!',
-      description: `Visitor "${values.name}" has been logged successfully.`,
+      description: `Visitor "${values.name}" from ${values.college} has been logged successfully.`,
     });
   }
 
@@ -113,6 +134,33 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
                       <SelectItem value="Borrow/Return">Borrow/Return</SelectItem>
                       <SelectItem value="Event">Event</SelectItem>
                       <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="college"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>College/Department</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a college" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {colleges.map((college) => (
+                        <SelectItem key={college} value={college}>
+                          {college}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

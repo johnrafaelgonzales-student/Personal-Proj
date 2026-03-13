@@ -2,7 +2,24 @@ import type { Visitor, VisitorPurpose, EntryType } from './types';
 
 const firstNames = ['Aria', 'Leo', 'Zoe', 'Kai', 'Mia', 'Eli', 'Noa', 'Ian', 'Eva', 'Jax'];
 const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
-const colleges = ['College of Engineering', 'College of Science', 'College of Arts', 'Business School', 'Law School', 'Medical School'];
+const colleges = [
+  'College of Accountancy',
+  'College of Agriculture',
+  'College of Arts and Sciences',
+  'College of Business Administration',
+  'College of Communication',
+  'College of Informatics and Computing Studies',
+  'College of Criminology',
+  'College of Education',
+  'College of Engineering and Architecture',
+  'College of Medical Technology',
+  'College of Midwifery',
+  'College of Music',
+  'College of Nursing',
+  'College of Physical Therapy',
+  'College of Respiratory Therapy',
+  'School of International Relations',
+];
 const purposes: VisitorPurpose[] = ['Research', 'Study', 'Borrow/Return', 'Event', 'Other'];
 const entryTypes: EntryType[] = ['manual', 'rfid', 'email'];
 
@@ -69,7 +86,7 @@ export const getVisitorsFromStore = (): Visitor[] => {
   }
 };
 
-export const addVisitorToStore = (visitorData: { name: string; purpose: VisitorPurpose }) => {
+export const addVisitorToStore = (visitorData: { name: string; purpose: VisitorPurpose; college: string; }) => {
     if (typeof window === 'undefined') return;
     try {
         const currentVisitors = getVisitorsFromStore();
@@ -80,7 +97,7 @@ export const addVisitorToStore = (visitorData: { name: string; purpose: VisitorP
             entryTime: new Date(),
             entryType: 'manual',
             avatarUrl: `https://picsum.photos/seed/${encodeURIComponent(visitorData.name)}/100/100`,
-            college: getRandomElement(colleges),
+            college: visitorData.college,
             blocked: false,
         };
         const updatedVisitors = [newVisitor, ...currentVisitors];

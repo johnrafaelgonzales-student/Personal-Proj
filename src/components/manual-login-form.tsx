@@ -18,9 +18,29 @@ const adminSchema = z.object({
   password: z.string().min(1, { message: 'Password is required.' }),
 });
 
+const colleges = [
+  'College of Accountancy',
+  'College of Agriculture',
+  'College of Arts and Sciences',
+  'College of Business Administration',
+  'College of Communication',
+  'College of Informatics and Computing Studies',
+  'College of Criminology',
+  'College of Education',
+  'College of Engineering and Architecture',
+  'College of Medical Technology',
+  'College of Midwifery',
+  'College of Music',
+  'College of Nursing',
+  'College of Physical Therapy',
+  'College of Respiratory Therapy',
+  'School of International Relations',
+];
+
 const visitorSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   purpose: z.enum(['Research', 'Study', 'Borrow/Return', 'Event', 'Other']),
+  college: z.string({ required_error: 'Please select a college.' }),
 });
 
 export function ManualLoginForm() {
@@ -34,7 +54,7 @@ export function ManualLoginForm() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: is_admin ? { email: '', password: '' } : { name: '', purpose: 'Study' },
+    defaultValues: is_admin ? { email: '', password: '' } : { name: '', purpose: 'Study', college: undefined },
   });
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -147,6 +167,33 @@ export function ManualLoginForm() {
                           <SelectItem value="Borrow/Return">Borrow/Return</SelectItem>
                           <SelectItem value="Event">Event</SelectItem>
                           <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="college"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>College/Department</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-white/20 border-white/30">
+                            <SelectValue placeholder="Select your college" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {colleges.map((college) => (
+                            <SelectItem key={college} value={college}>
+                              {college}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />

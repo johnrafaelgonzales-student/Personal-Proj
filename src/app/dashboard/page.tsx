@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   PlusCircle,
   Settings,
+  LogOut,
 } from 'lucide-react';
 
 import {
@@ -26,6 +27,14 @@ import { ManualEntryForm } from '@/components/manual-entry-form';
 import { AdminDashboard } from '@/components/admin-dashboard';
 import { VisitorLogTable } from '@/components/visitor-log-table';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 
 type AdminView = 'dashboard' | 'log';
@@ -56,10 +65,17 @@ export default function AdminDashboardPage() {
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <Link href="/" className="flex items-center gap-2">
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.reload();
+            }}
+            className="flex items-center gap-2"
+          >
             <BookOpenCheck className="size-6 text-primary" />
             <h1 className="text-lg font-semibold">NEU Library</h1>
-          </Link>
+          </a>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
@@ -104,12 +120,29 @@ export default function AdminDashboardPage() {
                 <span>Manual Entry</span>
               </Button>
             </ManualEntryForm>
-            <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="overflow-hidden rounded-full h-8 w-8"
+                >
+                  <Avatar className="h-8 w-8">
                     <AvatarFallback>GR</AvatarFallback>
-                </Avatar>
-                <span className="text-sm font-medium">Gonzales, Rafael</span>
-            </div>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Gonzales, Rafael</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <Link href="/">
+                  <DropdownMenuItem>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
