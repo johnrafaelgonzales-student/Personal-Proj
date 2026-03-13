@@ -19,7 +19,12 @@ const adminSchema = z.object({
 });
 
 const visitorSchema = z.object({
-  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+  email: z
+    .string()
+    .email({ message: 'Please enter a valid email.' })
+    .refine((email) => email.endsWith('@neu.edu.ph'), {
+      message: 'Please use your institutional @neu.edu.ph email.',
+    }),
   purpose: z.enum(['Research', 'Study', 'Borrow/Return', 'Event', 'Other']),
   college: z.string({ required_error: 'Please select a college/office.' }),
 });
@@ -35,7 +40,7 @@ export function ManualLoginForm() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: is_admin ? { email: '', password: '' } : { name: '', purpose: 'Study', college: undefined },
+    defaultValues: is_admin ? { email: '', password: '' } : { email: '', purpose: 'Study', college: undefined },
   });
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -64,14 +69,33 @@ export function ManualLoginForm() {
       const visitorValues = values as z.infer<typeof visitorSchema>;
       console.log('Visitor entry:', visitorValues);
 
+      const emailToName = (email: string): string => {
+        if (!email.includes('@')) return email;
+        const emailUser = email.split('@')[0];
+        const nameParts = emailUser.split('.').map(
+          part => part.charAt(0).toUpperCase() + part.slice(1)
+        );
+        if (nameParts.length > 1) {
+          const lastName = nameParts.pop();
+          return `${lastName}, ${nameParts.join(' ')}`;
+        }
+        return nameParts[0] || '';
+      };
+      
+      const derivedName = emailToName(visitorValues.email);
+
       // Add visitor to our "database"
-      addVisitorToStore(visitorValues);
+      addVisitorToStore({ 
+        name: derivedName, 
+        purpose: visitorValues.purpose, 
+        college: visitorValues.college 
+      });
 
       toast({
         title: 'Entry Logged!',
-        description: `Welcome, ${visitorValues.name}. Your visit has been recorded.`,
+        description: `Welcome, ${derivedName}. Your visit has been recorded.`,
       });
-      router.push(`/visitor-dashboard?name=${encodeURIComponent(visitorValues.name)}`);
+      router.push(`/visitor-dashboard?name=${encodeURIComponent(derivedName)}`);
     }
   }
 
@@ -119,12 +143,16 @@ export function ManualLoginForm() {
               <>
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>Institutional Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., John Doe" {...field} className="bg-white/20 border-white/30 placeholder:text-gray-400" />
+                        <Input 
+                            type="email" 
+                            placeholder="juan.delacruz@neu.edu.ph" 
+                            {...field} 
+                            className="bg-white/20 border-white/30 placeholder:text-gray-400" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
