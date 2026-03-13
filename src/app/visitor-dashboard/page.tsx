@@ -48,7 +48,7 @@ function VisitorDashboardContent() {
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
         <Link href="/" className="flex items-center gap-2">
           <BookOpenCheck className="size-6 text-primary" />
-          <h1 className="text-lg font-semibold">LibFlow</h1>
+          <h1 className="text-lg font-semibold">NEU Library</h1>
         </Link>
 
         <div className="flex items-center gap-4">

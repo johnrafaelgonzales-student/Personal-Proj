@@ -45,9 +45,20 @@ export function ManualLoginForm() {
     setIsSubmitting(false);
 
     if (is_admin) {
-      // In a real app, you'd validate credentials
-      console.log('Admin login attempt:', values);
-      router.push('/dashboard');
+      const adminValues = values as z.infer<typeof adminSchema>;
+      if (
+        adminValues.email === 'johnrafael.gonzales@neu.edu.ph' &&
+        adminValues.password === 'Akobossdto23'
+      ) {
+        console.log('Admin login successful:', values);
+        router.push('/dashboard');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Invalid Credentials',
+          description: 'Please check your email and password.',
+        });
+      }
     } else {
       const visitorValues = values as z.infer<typeof visitorSchema>;
       console.log('Visitor entry:', visitorValues);

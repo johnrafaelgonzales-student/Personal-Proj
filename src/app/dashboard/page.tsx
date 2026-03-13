@@ -58,7 +58,7 @@ export default function AdminDashboardPage() {
         <SidebarHeader>
           <Link href="/" className="flex items-center gap-2">
             <BookOpenCheck className="size-6 text-primary" />
-            <h1 className="text-lg font-semibold">LibFlow</h1>
+            <h1 className="text-lg font-semibold">NEU Library</h1>
           </Link>
         </SidebarHeader>
         <SidebarContent>
