@@ -44,6 +44,7 @@ import {
 } from './ui/dropdown-menu';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 
 const PIE_COLORS = [
   '#0ea5e9',
@@ -182,7 +183,7 @@ export function AdminDashboard() {
     return data;
   }, [allVisitors, date]);
 
-  const handleDownload = (
+  const handleDownload = async (
     reportType: 'daily' | 'weekly' | 'monthly' | 'full'
   ) => {
     const doc = new jsPDF();
@@ -193,6 +194,42 @@ export function AdminDashboard() {
       14,
       16
     );
+
+    const addChartToPdf = async (doc: jsPDF, elementId: string, title: string, y: number) => {
+        const element = document.getElementById(elementId);
+        if (!element) return y;
+    
+        const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: 'white'
+        });
+        const imgData = canvas.toDataURL('image/png');
+        const pdfWidth = doc.internal.pageSize.getWidth();
+        const imgHeight = (canvas.height * (pdfWidth - 28)) / canvas.width;
+        
+        let newY = y;
+        if (y + imgHeight > doc.internal.pageSize.getHeight() - 20) {
+            doc.addPage();
+            newY = 15;
+        }
+        
+        doc.text(title, 14, newY);
+        doc.addImage(imgData, 'PNG', 14, newY + 5, pdfWidth - 28, imgHeight);
+        
+        return newY + imgHeight + 15;
+      };
+      
+      let yPos = 30;
+      doc.text('Charts', 14, yPos);
+      yPos += 10;
+  
+      yPos = await addChartToPdf(doc, 'daily-chart-card', "Today's Visitors", yPos);
+      yPos = await addChartToPdf(doc, 'weekly-chart-card', "This Week's Visitors", yPos);
+      yPos = await addChartToPdf(doc, 'monthly-chart-card', "This Month's Visitors", yPos);
+      yPos = await addChartToPdf(doc, 'traffic-chart-card', 'Visitor Traffic', yPos);
+      
+      doc.addPage();
 
     let dataToExport: Visitor[] = [];
     const now = new Date();
@@ -231,10 +268,11 @@ export function AdminDashboard() {
     }
 
     (doc as any).autoTable({
-      head: [['Name', 'Purpose', 'Entry Time', 'Entry Type']],
+      head: [['Name', 'Purpose', 'College/Office', 'Entry Time', 'Entry Type']],
       body: dataToExport.map((v) => [
         v.name,
         v.purpose,
+        v.college,
         v.entryTime.toLocaleString(),
         v.entryType,
       ]),
@@ -249,7 +287,7 @@ export function AdminDashboard() {
   return (
     <div className="grid gap-4 md:gap-6">
       <div className="grid gap-4 md:grid-cols-3">
-        <Card>
+        <Card id="daily-chart-card">
           <CardHeader>
             <CardTitle className="text-base font-medium">
               Today's Visitors (by Hour)
@@ -291,7 +329,7 @@ export function AdminDashboard() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card>
+        <Card id="weekly-chart-card">
           <CardHeader>
             <CardTitle className="text-base font-medium">
               This Week's Visitors (by Day)
@@ -337,7 +375,7 @@ export function AdminDashboard() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card>
+        <Card id="monthly-chart-card">
           <CardHeader>
             <CardTitle className="text-base font-medium">
               This Month's Visitors (by Day)
@@ -383,7 +421,7 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
-      <Card>
+      <Card id="traffic-chart-card">
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
