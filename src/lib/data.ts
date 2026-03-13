@@ -2,7 +2,7 @@ import type { Visitor, VisitorPurpose, EntryType } from './types';
 
 const firstNames = ['Aria', 'Leo', 'Zoe', 'Kai', 'Mia', 'Eli', 'Noa', 'Ian', 'Eva', 'Jax'];
 const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
-const colleges = [
+export const colleges = [
   'College of Accountancy',
   'College of Agriculture',
   'College of Arts and Sciences',
@@ -20,6 +20,67 @@ const colleges = [
   'College of Respiratory Therapy',
   'School of International Relations',
 ];
+
+export const offices = {
+  "Executive / Administration Offices": [
+    "Office of the President",
+    "Office of the Vice President for Academic Affairs",
+    "Office of the Vice President for Administration",
+    "Office of the Vice President for Finance",
+    "Legal Affairs Office",
+  ],
+  "Academic Administration": [
+    "Registrar / Records and Registration Management Office (RRMO)",
+    "Admissions Office",
+    "Research and Development Office",
+    "Center for Continuing Professional Development (CCPD)",
+    "Quality Assurance Office",
+    "Curriculum Development Office",
+  ],
+  "Student Services Offices": [
+    "Office of Student Development (OSD)",
+    "Guidance and Counseling Office",
+    "University Clinic / Health Services Office",
+    "Scholarship and Financial Assistance Office",
+    "Student Affairs Office",
+  ],
+  "Financial Offices": [
+    "Accounting Office",
+    "Cashier’s Office",
+    "Budget Office",
+    "Auditing Office",
+  ],
+  "Human Resource & Administration": [
+    "Human Resource Management Office (HRMO)",
+    "General Services Office",
+    "Procurement / Supply Office",
+    "Property and Facilities Management Office",
+    "Records Management Office",
+  ],
+  "Technology & Information Offices": [
+    "Computer Services Department (CSD)",
+    "Management Information Systems Office",
+    "Data Privacy Office",
+  ],
+  "Academic Resource Offices": [
+    "Library Department",
+    "University Clinic / Health Services Office",
+    "Testing and Evaluation Center",
+    "Research Center",
+    "Laboratory Services Office",
+    "Publications and Media Office",
+  ],
+  "Other Institutional Offices": [
+    "Integrated School Office (K–12 administration)",
+    "Graduate School Office",
+    "International Affairs / External Relations Office",
+    "Alumni Affairs Office",
+    "Community Extension Services Office",
+    "Public Affairs / Public Relations Office",
+  ]
+};
+
+const allDepartments = [...colleges, ...Object.values(offices).flat()];
 const purposes: VisitorPurpose[] = ['Research', 'Study', 'Borrow/Return', 'Event', 'Other'];
 const entryTypes: EntryType[] = ['manual', 'rfid', 'email'];
 
@@ -48,7 +109,7 @@ export const generateMockVisitors = (count: number): Visitor[] => {
       entryTime: getRandomDate(),
       entryType: getRandomElement(entryTypes),
       avatarUrl: `https://picsum.photos/seed/user${(i % 5) + 1}/100/100`,
-      college: getRandomElement(colleges),
+      college: getRandomElement(allDepartments),
       blocked: false,
     });
   }

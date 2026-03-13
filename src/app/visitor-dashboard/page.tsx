@@ -100,7 +100,7 @@ function VisitorDashboardContent() {
               </CardDescription>
             </CardHeader>
           </Card>
-          <VisitorHistoryTable />
+          <VisitorHistoryTable visitorName={name} />
         </div>
       </main>
     </div>

@@ -7,7 +7,7 @@ function LoginPageContent() {
   return (
     <div className="relative flex h-screen w-full items-center justify-center text-white">
       <Image
-        src="https://images.unsplash.com/photo-1543002588-b9b6b62224c5?q=80&w=2070&auto=format&fit=crop"
+        src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2128&auto=format&fit=crop"
         alt="Library background"
         fill
         className="object-cover"

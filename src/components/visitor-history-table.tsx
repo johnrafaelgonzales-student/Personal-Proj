@@ -18,13 +18,28 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { mockVisitors } from '@/lib/data';
+import { getVisitorsFromStore } from '@/lib/data';
 import type { Visitor } from '@/lib/types';
 
-// Let's take a slice of the data to represent a single visitor's history
-const visitorHistory: Visitor[] = mockVisitors.slice(0, 8);
+export function VisitorHistoryTable({ visitorName }: { visitorName: string }) {
+  const [visitorHistory, setVisitorHistory] = React.useState<Visitor[]>([]);
 
-export function VisitorHistoryTable() {
+  React.useEffect(() => {
+    const loadData = () => {
+      const allVisitors = getVisitorsFromStore();
+      const history = allVisitors.filter(
+        (v) => v.name.toLowerCase() === visitorName.toLowerCase()
+      );
+      setVisitorHistory(history);
+    };
+
+    loadData();
+    window.addEventListener('focus', loadData);
+    return () => {
+      window.removeEventListener('focus', loadData);
+    };
+  }, [visitorName]);
+
   return (
     <Card>
       <CardHeader>
@@ -40,6 +55,7 @@ export function VisitorHistoryTable() {
               <TableHead>Date</TableHead>
               <TableHead>Time</TableHead>
               <TableHead>Purpose</TableHead>
+              <TableHead>College Department/Office</TableHead>
               <TableHead className="hidden md:table-cell">Entry Type</TableHead>
             </TableRow>
           </TableHeader>
@@ -54,6 +70,7 @@ export function VisitorHistoryTable() {
                   <TableCell>
                     <Badge variant="outline">{visit.purpose}</Badge>
                   </TableCell>
+                  <TableCell>{visit.college}</TableCell>
                   <TableCell className="hidden md:table-cell">
                     {visit.entryType}
                   </TableCell>
@@ -61,7 +78,7 @@ export function VisitorHistoryTable() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center">
                   No visit history found.
                 </TableCell>
               </TableRow>

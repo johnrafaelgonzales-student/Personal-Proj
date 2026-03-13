@@ -9,38 +9,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { addVisitorToStore } from '@/lib/data';
+import { addVisitorToStore, colleges, offices } from '@/lib/data';
 
 const adminSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
 });
 
-const colleges = [
-  'College of Accountancy',
-  'College of Agriculture',
-  'College of Arts and Sciences',
-  'College of Business Administration',
-  'College of Communication',
-  'College of Informatics and Computing Studies',
-  'College of Criminology',
-  'College of Education',
-  'College of Engineering and Architecture',
-  'College of Medical Technology',
-  'College of Midwifery',
-  'College of Music',
-  'College of Nursing',
-  'College of Physical Therapy',
-  'College of Respiratory Therapy',
-  'School of International Relations',
-];
-
 const visitorSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   purpose: z.enum(['Research', 'Study', 'Borrow/Return', 'Event', 'Other']),
-  college: z.string({ required_error: 'Please select a college.' }),
+  college: z.string({ required_error: 'Please select a college/office.' }),
 });
 
 export function ManualLoginForm() {
@@ -178,21 +159,34 @@ export function ManualLoginForm() {
                   name="college"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>College/Department</FormLabel>
+                      <FormLabel>College Department/Office</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger className="bg-white/20 border-white/30">
-                            <SelectValue placeholder="Select your college" />
+                            <SelectValue placeholder="Select your department/office" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {colleges.map((college) => (
-                            <SelectItem key={college} value={college}>
-                              {college}
-                            </SelectItem>
+                          <SelectGroup>
+                            <SelectLabel>Colleges</SelectLabel>
+                            {colleges.map((college) => (
+                              <SelectItem key={college} value={college}>
+                                {college}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                          {Object.entries(offices).map(([group, officeList]) => (
+                            <SelectGroup key={group}>
+                              <SelectLabel>{group}</SelectLabel>
+                              {officeList.map((office) => (
+                                 <SelectItem key={office} value={office}>
+                                   {office}
+                                 </SelectItem>
+                              ))}
+                            </SelectGroup>
                           ))}
                         </SelectContent>
                       </Select>

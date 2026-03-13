@@ -104,7 +104,7 @@ export function VisitorLogTable() {
               </TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Purpose</TableHead>
-              <TableHead className="hidden md:table-cell">College</TableHead>
+              <TableHead className="hidden md:table-cell">College/Office</TableHead>
               <TableHead className="hidden md:table-cell">Entry Type</TableHead>
               <TableHead className="hidden md:table-cell">
                 Entry Time
