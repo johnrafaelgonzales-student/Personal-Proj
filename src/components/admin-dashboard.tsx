@@ -14,10 +14,7 @@ import {
   LineChart,
   Line,
 } from 'recharts';
-import {
-  CalendarDays,
-  Download,
-} from 'lucide-react';
+import { CalendarDays, Download } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -30,7 +27,8 @@ import {
   ChartTooltipContent,
   ChartContainer,
 } from '@/components/ui/chart';
-import { mockVisitors } from '@/lib/data';
+import { getVisitorsFromStore } from '@/lib/data';
+import type { Visitor } from '@/lib/types';
 import { TrendAnalysis } from './trend-analysis';
 import { Button } from './ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -38,75 +36,24 @@ import { Calendar } from './ui/calendar';
 import React from 'react';
 import { DateRange } from 'react-day-picker';
 import { addDays, format } from 'date-fns';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
-const now = new Date();
-const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-// Daily Data (by hour from 8 AM to 5 PM)
-const dailyData = Array.from({ length: 10 }, (_, i) => {
-    const hour = i + 8;
-    return {
-        name: `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'AM' : 'PM'}`,
-        visitors: mockVisitors.filter(v => {
-            const entryDate = new Date(v.entryTime);
-            return entryDate.getDate() === today.getDate() &&
-                   entryDate.getMonth() === today.getMonth() &&
-                   entryDate.getFullYear() === today.getFullYear() &&
-                   entryDate.getHours() === hour;
-        }).length
-    };
-});
-
-// Weekly Data (by day)
-const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const startOfWeek = new Date(today);
-startOfWeek.setDate(today.getDate() - today.getDay());
-const endOfWeek = new Date(startOfWeek);
-endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-const weeklyData = weekDays.map((day, index) => {
-    return {
-        name: day,
-        visitors: mockVisitors.filter(v => {
-            const entryDate = new Date(v.entryTime);
-            const entryDay = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
-            const startDay = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate());
-            const endDay = new Date(endOfWeek.getFullYear(), endOfWeek.getMonth(), endOfWeek.getDate());
-            return entryDay >= startDay && entryDay <= endDay && entryDate.getDay() === index;
-        }).length
-    };
-}).filter(d => d.visitors > 0);
-
-const PIE_COLORS = ['#0ea5e9', '#84cc16', '#f97316', '#eab308', '#d946ef', '#14b8a6', '#f43f5e'];
-
-// Monthly Data (by day of month)
-const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-
-const monthlyData = Array.from({ length: daysInMonth }, (_, i) => {
-    const day = i + 1;
-    return {
-        name: `${day}`,
-        visitors: mockVisitors.filter(v => {
-            const entryDate = new Date(v.entryTime);
-            return entryDate.getMonth() === today.getMonth() &&
-                   entryDate.getFullYear() === today.getFullYear() &&
-                   entryDate.getDate() === day;
-        }).length
-    };
-});
-
-
-const trafficChartData = Array.from({ length: 7 }, (_, i) => {
-  const date = new Date();
-  date.setDate(now.getDate() - (6 - i));
-  return {
-    date: date.toLocaleDateString('en-US', { weekday: 'short' }),
-    visitors: mockVisitors.filter(
-      (v) => v.entryTime.toDateString() === date.toDateString()
-    ).length,
-  };
-});
+const PIE_COLORS = [
+  '#0ea5e9',
+  '#84cc16',
+  '#f97316',
+  '#eab308',
+  '#d946ef',
+  '#14b8a6',
+  '#f43f5e',
+];
 
 const chartConfig = {
   visitors: {
@@ -116,75 +63,324 @@ const chartConfig = {
 };
 
 export function AdminDashboard() {
-    const [date, setDate] = React.useState<DateRange | undefined>({
-        from: addDays(new Date(), -6),
-        to: new Date(),
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: addDays(new Date(), -6),
+    to: new Date(),
+  });
+  const [allVisitors, setAllVisitors] = React.useState<Visitor[]>([]);
+
+  React.useEffect(() => {
+    const loadData = () => setAllVisitors(getVisitorsFromStore());
+    loadData();
+    window.addEventListener('focus', loadData);
+    return () => window.removeEventListener('focus', loadData);
+  }, []);
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const dailyData = React.useMemo(
+    () =>
+      Array.from({ length: 10 }, (_, i) => {
+        const hour = i + 8;
+        return {
+          name: `${hour % 12 === 0 ? 12 : hour % 12}${
+            hour < 12 ? 'AM' : 'PM'
+          }`,
+          visitors: allVisitors.filter((v) => {
+            const entryDate = new Date(v.entryTime);
+            return (
+              entryDate.getDate() === today.getDate() &&
+              entryDate.getMonth() === today.getMonth() &&
+              entryDate.getFullYear() === today.getFullYear() &&
+              entryDate.getHours() === hour
+            );
+          }).length,
+        };
+      }),
+    [allVisitors, today]
+  );
+
+  const weeklyData = React.useMemo(() => {
+    const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    return weekDays
+      .map((day, index) => {
+        return {
+          name: day,
+          visitors: allVisitors.filter((v) => {
+            const entryDate = new Date(v.entryTime);
+            const entryDay = new Date(
+              entryDate.getFullYear(),
+              entryDate.getMonth(),
+              entryDate.getDate()
+            );
+            const startDay = new Date(
+              startOfWeek.getFullYear(),
+              startOfWeek.getMonth(),
+              startOfWeek.getDate()
+            );
+            const endDay = new Date(
+              endOfWeek.getFullYear(),
+              endOfWeek.getMonth(),
+              endOfWeek.getDate()
+            );
+            return (
+              entryDay >= startDay &&
+              entryDay <= endDay &&
+              entryDate.getDay() === index
+            );
+          }).length,
+        };
+      })
+      .filter((d) => d.visitors > 0);
+  }, [allVisitors, today]);
+
+  const monthlyData = React.useMemo(() => {
+    const daysInMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      0
+    ).getDate();
+    return Array.from({ length: daysInMonth }, (_, i) => {
+      const day = i + 1;
+      return {
+        name: `${day}`,
+        visitors: allVisitors.filter((v) => {
+          const entryDate = new Date(v.entryTime);
+          return (
+            entryDate.getMonth() === today.getMonth() &&
+            entryDate.getFullYear() === today.getFullYear() &&
+            entryDate.getDate() === day
+          );
+        }).length,
+      };
     });
+  }, [allVisitors, today]);
+
+  const trafficChartData = React.useMemo(() => {
+    if (!date?.from) return [];
+    const data = [];
+    const currentDate = new Date(date.from);
+    const endDate = date.to ? new Date(date.to) : new Date(date.from);
+
+    while (currentDate <= endDate) {
+      const dateStr = currentDate.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
+      const visitorCount = allVisitors.filter(
+        (v) => new Date(v.entryTime).toDateString() === currentDate.toDateString()
+      ).length;
+      data.push({ date: dateStr, visitors: visitorCount });
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return data;
+  }, [allVisitors, date]);
+
+  const handleDownload = (
+    reportType: 'daily' | 'weekly' | 'monthly' | 'full'
+  ) => {
+    const doc = new jsPDF();
+    doc.text(
+      `Visitor Report - ${
+        reportType.charAt(0).toUpperCase() + reportType.slice(1)
+      }`,
+      14,
+      16
+    );
+
+    let dataToExport: Visitor[] = [];
+    const now = new Date();
+
+    switch (reportType) {
+      case 'daily':
+        dataToExport = allVisitors.filter((v) => {
+          const entryDate = new Date(v.entryTime);
+          return entryDate.toDateString() === now.toDateString();
+        });
+        break;
+      case 'weekly':
+        const startOfWeek = new Date(now);
+        startOfWeek.setHours(0, 0, 0, 0);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+        dataToExport = allVisitors.filter((v) => {
+          const entryDate = new Date(v.entryTime);
+          return entryDate >= startOfWeek && entryDate <= endOfWeek;
+        });
+        break;
+      case 'monthly':
+        dataToExport = allVisitors.filter((v) => {
+          const entryDate = new Date(v.entryTime);
+          return (
+            entryDate.getMonth() === now.getMonth() &&
+            entryDate.getFullYear() === now.getFullYear()
+          );
+        });
+        break;
+      case 'full':
+        dataToExport = allVisitors;
+        break;
+    }
+
+    (doc as any).autoTable({
+      head: [['Name', 'Purpose', 'Entry Time', 'Entry Type']],
+      body: dataToExport.map((v) => [
+        v.name,
+        v.purpose,
+        v.entryTime.toLocaleString(),
+        v.entryType,
+      ]),
+      startY: 20,
+    });
+
+    doc.save(
+      `libflow-report-${reportType}-${new Date().toISOString().split('T')[0]}.pdf`
+    );
+  };
 
   return (
     <div className="grid gap-4 md:gap-6">
-       <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
-            <CardHeader>
-                <CardTitle className="text-base font-medium">
-                Today's Visitors (by Hour)
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig} className="h-48 w-full">
-                    <ResponsiveContainer>
-                        <BarChart data={dailyData} margin={{ top: 0, right: 0, left: -20, bottom: -10 }}>
-                            <CartesianGrid vertical={false} />
-                            <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
-                            <YAxis tickLine={false} axisLine={false} tickMargin={10} allowDecimals={false} fontSize={12} />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                            <Bar dataKey="visitors" fill="var(--color-visitors)" radius={4} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </ChartContainer>
-            </CardContent>
+          <CardHeader>
+            <CardTitle className="text-base font-medium">
+              Today's Visitors (by Hour)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="h-48 w-full">
+              <ResponsiveContainer>
+                <BarChart
+                  data={dailyData}
+                  margin={{ top: 0, right: 0, left: -20, bottom: -10 }}
+                >
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="name"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    fontSize={10}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={10}
+                    allowDecimals={false}
+                    fontSize={12}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="dot" />}
+                  />
+                  <Bar
+                    dataKey="visitors"
+                    fill="var(--color-visitors)"
+                    radius={4}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
         </Card>
         <Card>
-            <CardHeader>
-                <CardTitle className="text-base font-medium">
-                This Week's Visitors (by Day)
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig} className="h-48 w-full">
-                    <ResponsiveContainer>
-                        <PieChart>
-                            <Pie data={weeklyData} dataKey="visitors" nameKey="name" cx="50%" cy="50%" innerRadius={30} outerRadius={50} paddingAngle={2}>
-                                {weeklyData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                            <Legend layout="vertical" align="right" verticalAlign="middle" iconSize={10} wrapperStyle={{fontSize: '12px', paddingLeft: '10px'}}/>
-                        </PieChart>
-                    </ResponsiveContainer>
-                </ChartContainer>
-            </CardContent>
+          <CardHeader>
+            <CardTitle className="text-base font-medium">
+              This Week's Visitors (by Day)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="h-48 w-full">
+              <ResponsiveContainer>
+                <PieChart>
+                  <Pie
+                    data={weeklyData}
+                    dataKey="visitors"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={30}
+                    outerRadius={50}
+                    paddingAngle={2}
+                  >
+                    {weeklyData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={PIE_COLORS[index % PIE_COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Legend
+                    layout="vertical"
+                    align="right"
+                    verticalAlign="middle"
+                    iconSize={10}
+                    wrapperStyle={{
+                      fontSize: '12px',
+                      paddingLeft: '10px',
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
         </Card>
         <Card>
-            <CardHeader>
-                <CardTitle className="text-base font-medium">
-                This Month's Visitors (by Day)
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig} className="h-48 w-full">
-                    <ResponsiveContainer>
-                        <LineChart data={monthlyData} margin={{ top: 5, right: 10, left: -20, bottom: -10 }}>
-                             <CartesianGrid vertical={false} />
-                            <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={10} fontSize={10} interval={6} />
-                            <YAxis tickLine={false} axisLine={false} tickMargin={10} allowDecimals={false} fontSize={12}/>
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                            <Line type="monotone" dataKey="visitors" stroke="var(--color-visitors)" strokeWidth={2} dot={false} />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </ChartContainer>
-            </CardContent>
+          <CardHeader>
+            <CardTitle className="text-base font-medium">
+              This Month's Visitors (by Day)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="h-48 w-full">
+              <ResponsiveContainer>
+                <LineChart
+                  data={monthlyData}
+                  margin={{ top: 5, right: 10, left: -20, bottom: -10 }}
+                >
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="name"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={10}
+                    fontSize={10}
+                    interval={6}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={10}
+                    allowDecimals={false}
+                    fontSize={12}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="dot" />}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="visitors"
+                    stroke="var(--color-visitors)"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
         </Card>
       </div>
       <Card>
@@ -230,10 +426,28 @@ export function AdminDashboard() {
                   />
                 </PopoverContent>
               </Popover>
-              <Button variant="outline" size="icon">
-                <Download className="h-4 w-4" />
-                <span className="sr-only">Download Report</span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Download className="h-4 w-4" />
+                    <span className="sr-only">Download Report</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleDownload('daily')}>
+                    Daily Report
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload('weekly')}>
+                    Weekly Report
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload('monthly')}>
+                    Monthly Report
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload('full')}>
+                    Full Report
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </CardHeader>
@@ -259,7 +473,11 @@ export function AdminDashboard() {
                   cursor={false}
                   content={<ChartTooltipContent indicator="dot" />}
                 />
-                <Bar dataKey="visitors" fill="var(--color-visitors)" radius={4} />
+                <Bar
+                  dataKey="visitors"
+                  fill="var(--color-visitors)"
+                  radius={4}
+                />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>

@@ -10,9 +10,11 @@ export default function RoleSelectionPage() {
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-gradient-to-br from-black to-zinc-800 text-white">
-      <Card className="w-full max-w-md bg-white/10 backdrop-blur-sm border-white/20">
+      <Card className="w-full max-w-md border-white/20 bg-accent/20 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-center text-3xl font-bold">Welcome to LibFlow</CardTitle>
+          <CardTitle className="text-center text-3xl font-bold [text-shadow:0_0_8px_hsl(var(--accent))]">
+            Welcome to NEU Library
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4 p-6">
           <Button
