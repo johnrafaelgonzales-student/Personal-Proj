@@ -200,11 +200,11 @@ export function AdminDashboard() {
         if (!element) return y;
     
         const canvas = await html2canvas(element, {
-            scale: 2,
+            scale: 1,
             useCORS: true,
             backgroundColor: 'white'
         });
-        const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL('image/jpeg', 0.75);
         const pdfWidth = doc.internal.pageSize.getWidth();
         const imgHeight = (canvas.height * (pdfWidth - 28)) / canvas.width;
         
@@ -215,7 +215,7 @@ export function AdminDashboard() {
         }
         
         doc.text(title, 14, newY);
-        doc.addImage(imgData, 'PNG', 14, newY + 5, pdfWidth - 28, imgHeight);
+        doc.addImage(imgData, 'JPEG', 14, newY + 5, pdfWidth - 28, imgHeight, undefined, 'MEDIUM');
         
         return newY + imgHeight + 15;
       };
