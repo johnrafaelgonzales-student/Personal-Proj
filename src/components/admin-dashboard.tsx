@@ -418,7 +418,7 @@ export function AdminDashboard() {
       </Card>
 
       {/* AI-powered Trend Analysis Component */}
-      <TrendAnalysis />
+      <TrendAnalysis visitors={allVisitors} />
     </div>
   );
 }
