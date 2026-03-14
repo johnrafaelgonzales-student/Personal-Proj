@@ -162,25 +162,25 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Purpose of Visit</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a purpose" />
                       </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Research">Research</SelectItem>
-                      <SelectItem value="Study">Study</SelectItem>
-                      <SelectItem value="Borrow/Return">
-                        Borrow/Return
-                      </SelectItem>
-                      <SelectItem value="Event">Event</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
+                      <SelectContent>
+                        <SelectItem value="Research">Research</SelectItem>
+                        <SelectItem value="Study">Study</SelectItem>
+                        <SelectItem value="Borrow/Return">
+                          Borrow/Return
+                        </SelectItem>
+                        <SelectItem value="Event">Event</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -192,36 +192,36 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>College Department/Office</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a department/office" />
                       </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Colleges</SelectLabel>
-                        {colleges.map((college) => (
-                          <SelectItem key={college} value={college}>
-                            {college}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                      {Object.entries(offices).map(([group, officeList]) => (
-                        <SelectGroup key={group}>
-                          <SelectLabel>{group}</SelectLabel>
-                          {officeList.map((office) => (
-                            <SelectItem key={office} value={office}>
-                              {office}
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Colleges</SelectLabel>
+                          {colleges.map((college) => (
+                            <SelectItem key={college} value={college}>
+                              {college}
                             </SelectItem>
                           ))}
                         </SelectGroup>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                        {Object.entries(offices).map(([group, officeList]) => (
+                          <SelectGroup key={group}>
+                            <SelectLabel>{group}</SelectLabel>
+                            {officeList.map((office) => (
+                              <SelectItem key={office} value={office}>
+                                {office}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

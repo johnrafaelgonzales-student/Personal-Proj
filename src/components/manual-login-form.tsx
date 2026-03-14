@@ -135,15 +135,128 @@ export function ManualLoginForm() {
             {is_admin ? (
               // Admin-specific form fields
               <>
-                <FormField control={form.control} name="email" render={({ field }) => ( <FormItem> <FormLabel>Email</FormLabel> <FormControl> <Input placeholder="admin@example.com" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="password" render={({ field }) => ( <FormItem> <FormLabel>Password</FormLabel> <FormControl> <Input type="password" placeholder="********" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="admin@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="********"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </>
             ) : (
               // Visitor-specific form fields
               <>
-                <FormField control={form.control} name="email" render={({ field }) => ( <FormItem> <FormLabel>Institutional Email</FormLabel> <FormControl> <Input type="email" placeholder="juan.delacruz@neu.edu.ph" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="purpose" render={({ field }) => ( <FormItem> <FormLabel>Purpose of Visit</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl> <SelectTrigger> <SelectValue placeholder="Select a purpose" /> </SelectTrigger> </FormControl> <SelectContent> <SelectItem value="Research">Research</SelectItem> <SelectItem value="Study">Study</SelectItem> <SelectItem value="Borrow/Return">Borrow/Return</SelectItem> <SelectItem value="Event">Event</SelectItem> <SelectItem value="Other">Other</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="college" render={({ field }) => ( <FormItem> <FormLabel>College Department/Office</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value} > <FormControl> <SelectTrigger> <SelectValue placeholder="Select your department/office" /> </SelectTrigger> </FormControl> <SelectContent> <SelectGroup> <SelectLabel>Colleges</SelectLabel> {colleges.map((college) => ( <SelectItem key={college} value={college}> {college} </SelectItem> ))} </SelectGroup> {Object.entries(offices).map(([group, officeList]) => ( <SelectGroup key={group}> <SelectLabel>{group}</SelectLabel> {officeList.map((office) => ( <SelectItem key={office} value={office}> {office} </SelectItem> ))} </SelectGroup> ))} </SelectContent> </Select> <FormMessage /> </FormItem> )} />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Institutional Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="juan.delacruz@neu.edu.ph"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="purpose"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Purpose of Visit</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a purpose" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Research">Research</SelectItem>
+                            <SelectItem value="Study">Study</SelectItem>
+                            <SelectItem value="Borrow/Return">
+                              Borrow/Return
+                            </SelectItem>
+                            <SelectItem value="Event">Event</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="college"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>College Department/Office</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your department/office" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Colleges</SelectLabel>
+                              {colleges.map((college) => (
+                                <SelectItem key={college} value={college}>
+                                  {college}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                            {Object.entries(offices).map(
+                              ([group, officeList]) => (
+                                <SelectGroup key={group}>
+                                  <SelectLabel>{group}</SelectLabel>
+                                  {officeList.map((office) => (
+                                    <SelectItem key={office} value={office}>
+                                      {office}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              )
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </>
             )}
             <Button type="submit" disabled={isSubmitting} className="w-full bg-primary hover:bg-primary/90">
