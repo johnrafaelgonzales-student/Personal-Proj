@@ -1,5 +1,11 @@
+/**
+ * @fileoverview This file contains mock data and data-handling utility functions for the application.
+ * In a real-world scenario, this would be replaced with API calls to a backend service.
+ * For this prototype, it uses localStorage to simulate a persistent database.
+ */
 import type { Visitor, VisitorPurpose, EntryType } from './types';
 
+// Mock data for generating random visitor entries.
 const firstNames = ['Aria', 'Leo', 'Zoe', 'Kai', 'Mia', 'Eli', 'Noa', 'Ian', 'Eva', 'Jax'];
 const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
 export const colleges = [
@@ -22,62 +28,14 @@ export const colleges = [
 ];
 
 export const offices = {
-  "Executive / Administration Offices": [
-    "Office of the President",
-    "Office of the Vice President for Academic Affairs",
-    "Office of the Vice President for Administration",
-    "Office of the Vice President for Finance",
-    "Legal Affairs Office",
-  ],
-  "Academic Administration": [
-    "Registrar / Records and Registration Management Office (RRMO)",
-    "Admissions Office",
-    "Research and Development Office",
-    "Center for Continuing Professional Development (CCPD)",
-    "Quality Assurance Office",
-    "Curriculum Development Office",
-  ],
-  "Student Services Offices": [
-    "Office of Student Development (OSD)",
-    "Guidance and Counseling Office",
-    "University Clinic / Health Services Office",
-    "Scholarship and Financial Assistance Office",
-    "Student Affairs Office",
-  ],
-  "Financial Offices": [
-    "Accounting Office",
-    "Cashier’s Office",
-    "Budget Office",
-    "Auditing Office",
-  ],
-  "Human Resource & Administration": [
-    "Human Resource Management Office (HRMO)",
-    "General Services Office",
-    "Procurement / Supply Office",
-    "Property and Facilities Management Office",
-    "Records Management Office",
-  ],
-  "Technology & Information Offices": [
-    "Computer Services Department (CSD)",
-    "Management Information Systems Office",
-    "Data Privacy Office",
-  ],
-  "Academic Resource Offices": [
-    "Library Department",
-    "University Clinic / Health Services Office",
-    "Testing and Evaluation Center",
-    "Research Center",
-    "Laboratory Services Office",
-    "Publications and Media Office",
-  ],
-  "Other Institutional Offices": [
-    "Integrated School Office (K–12 administration)",
-    "Graduate School Office",
-    "International Affairs / External Relations Office",
-    "Alumni Affairs Office",
-    "Community Extension Services Office",
-    "Public Affairs / Public Relations Office",
-  ]
+  "Executive / Administration Offices": ["Office of the President", "Office of the Vice President for Academic Affairs", "Office of the Vice President for Administration", "Office of the Vice President for Finance", "Legal Affairs Office"],
+  "Academic Administration": ["Registrar / Records and Registration Management Office (RRMO)", "Admissions Office", "Research and Development Office", "Center for Continuing Professional Development (CCPD)", "Quality Assurance Office", "Curriculum Development Office"],
+  "Student Services Offices": ["Office of Student Development (OSD)", "Guidance and Counseling Office", "University Clinic / Health Services Office", "Scholarship and Financial Assistance Office", "Student Affairs Office"],
+  "Financial Offices": ["Accounting Office", "Cashier’s Office", "Budget Office", "Auditing Office"],
+  "Human Resource & Administration": ["Human Resource Management Office (HRMO)", "General Services Office", "Procurement / Supply Office", "Property and Facilities Management Office", "Records Management Office"],
+  "Technology & Information Offices": ["Computer Services Department (CSD)", "Management Information Systems Office", "Data Privacy Office"],
+  "Academic Resource Offices": ["Library Department", "University Clinic / Health Services Office", "Testing and Evaluation Center", "Research Center", "Laboratory Services Office", "Publications and Media Office"],
+  "Other Institutional Offices": ["Integrated School Office (K–12 administration)", "Graduate School Office", "International Affairs / External Relations Office", "Alumni Affairs Office", "Community Extension Services Office", "Public Affairs / Public Relations Office"]
 };
 
 const allDepartments = [...colleges, ...Object.values(offices).flat()];
@@ -86,7 +44,7 @@ const entryTypes: EntryType[] = ['manual', 'rfid', 'email'];
 
 const getRandomElement = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
-// Function to generate a random date within the last 90 days
+// Generates a random date within the last 90 days.
 const getRandomDate = (): Date => {
   const now = new Date();
   const aMonthAgo = new Date();
@@ -97,6 +55,11 @@ const getRandomDate = (): Date => {
   return new Date(randomTime);
 };
 
+/**
+ * Generates a specified number of mock visitor records.
+ * @param {number} count - The number of mock visitors to generate.
+ * @returns {Visitor[]} An array of mock visitor objects.
+ */
 export const generateMockVisitors = (count: number): Visitor[] => {
   const visitors: Visitor[] = [];
   for (let i = 0; i < count; i++) {
@@ -116,28 +79,36 @@ export const generateMockVisitors = (count: number): Visitor[] => {
   return visitors.sort((a, b) => b.entryTime.getTime() - a.entryTime.getTime());
 };
 
+// A pre-generated list of mock visitors.
 export const mockVisitors = generateMockVisitors(150);
 
+// Mock data for a logged-in user.
 export const mockUser = {
     name: 'Iglesia, Kim',
     email: 'kim.iglesia@neu.edu.ph',
     avatarUrl: 'https://picsum.photos/seed/librarian/100/100',
 };
 
-
 const VISITORS_STORAGE_KEY = 'libflow-visitors';
 
+/**
+ * Retrieves visitor data from localStorage. If no data is found, it initializes
+ * localStorage with the mock data.
+ * @returns {Visitor[]} The array of visitor objects.
+ */
 export const getVisitorsFromStore = (): Visitor[] => {
   if (typeof window === 'undefined') {
-    return mockVisitors;
+    return mockVisitors; // Return mock data during server-side rendering
   }
   try {
     const storedVisitors = window.localStorage.getItem(VISITORS_STORAGE_KEY);
     if (storedVisitors) {
       const parsed = JSON.parse(storedVisitors) as any[];
+      // Convert date strings back to Date objects.
       const visitors = parsed.map(v => ({ ...v, entryTime: new Date(v.entryTime) }));
       return visitors.sort((a, b) => b.entryTime.getTime() - a.entryTime.getTime());
     } else {
+      // Initialize localStorage if it's empty.
       window.localStorage.setItem(VISITORS_STORAGE_KEY, JSON.stringify(mockVisitors));
       return mockVisitors;
     }
@@ -147,6 +118,10 @@ export const getVisitorsFromStore = (): Visitor[] => {
   }
 };
 
+/**
+ * Adds a new visitor entry to localStorage.
+ * @param {object} visitorData - The data for the new visitor.
+ */
 export const addVisitorToStore = (visitorData: { name: string; purpose: VisitorPurpose; college: string; }) => {
     if (typeof window === 'undefined') return;
     try {
@@ -168,6 +143,11 @@ export const addVisitorToStore = (visitorData: { name: string; purpose: VisitorP
     }
 };
 
+/**
+ * Toggles the 'blocked' status of a visitor in localStorage.
+ * @param {string} visitorId - The ID of the visitor to update.
+ * @returns {Visitor[]} The updated list of visitors.
+ */
 export const toggleVisitorBlockStatus = (visitorId: string): Visitor[] => {
     if (typeof window === 'undefined') return [];
     try {

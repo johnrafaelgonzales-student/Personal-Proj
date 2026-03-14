@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Label component for labeling form elements.
+ * It's built on Radix UI's Label primitive and styled with Tailwind CSS.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/label
+ */
 "use client"
 
 import * as React from "react"

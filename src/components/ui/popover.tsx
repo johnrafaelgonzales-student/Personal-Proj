@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Popover component, which displays rich content in a portal, floating above the main UI.
+ * It's built on Radix UI's Popover primitive and styled with Tailwind CSS.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/popover
+ */
 "use client"
 
 import * as React from "react"

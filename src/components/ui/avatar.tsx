@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Avatar component for displaying user profile pictures or fallbacks.
+ * It includes sub-components for the image and a fallback (e.g., initials) if the image fails to load.
+ * Built on Radix UI's Avatar primitive and part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/avatar
+ */
 "use client"
 
 import * as React from "react"

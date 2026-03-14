@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Dialog component, a modal window that appears over the main content.
+ * It's built on Radix UI's Dialog primitive and is styled with Tailwind CSS.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/dialog
+ */
 "use client"
 
 import * as React from "react"

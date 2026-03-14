@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Menubar component, a horizontally-oriented menu for commands and options.
+ * It's built on Radix UI's Menubar primitive and styled with Tailwind CSS.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/menubar
+ */
 "use client"
 
 import * as React from "react"

@@ -1,8 +1,15 @@
+/**
+ * @fileoverview Defines the Badge component for displaying small status descriptors.
+ * It supports different variants like 'default', 'secondary', 'destructive', and 'outline'.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/badge
+ */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+// Defines the CSS variants for the badge component.
 const badgeVariants = cva(
   "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {

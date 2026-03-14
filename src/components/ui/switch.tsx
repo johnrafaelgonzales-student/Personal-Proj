@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Switch component, a control that toggles between on and off states.
+ * It's built on Radix UI's Switch primitive and styled with Tailwind CSS.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/switch
+ */
 "use client"
 
 import * as React from "react"

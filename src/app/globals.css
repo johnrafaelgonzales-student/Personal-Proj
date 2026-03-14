@@ -1,26 +1,37 @@
+/**
+ * @fileoverview This file contains the global CSS styles and theme variables for the application.
+ * It uses Tailwind CSS's `@layer` directive to define base styles and CSS custom properties (variables)
+ * for theming. This setup allows for easy switching between light and dark modes.
+ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /*
+   * Defines the color palette for the light theme using HSL values.
+   * These CSS variables are used throughout the application via Tailwind's color utilities
+   * (e.g., bg-background, text-primary).
+   */
   :root {
-    --background: 39 56% 96%; /* #FBF8F2 */
-    --foreground: 30 20% 15%; /* #2E2A26 */
+    --background: 39 56% 96%; /* A very light, warm off-white, like aged paper */
+    --foreground: 30 20% 15%; /* A dark, slightly warm brown for text */
     --card: 0 0% 100%;
     --card-foreground: 30 20% 15%;
     --popover: 0 0% 100%;
     --popover-foreground: 30 20% 15%;
-    --primary: 215 45% 35%; /* #314F80 */
+    --primary: 215 45% 35%; /* A classic, deep navy blue for primary actions */
     --primary-foreground: 0 0% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 30 15% 90%; /* #EAE7E4 */
-    --muted-foreground: 30 10% 45%; /* #7C7672 */
-    --accent: 38 60% 65%; /* #D9B377 */
+    --muted: 30 15% 90%; /* A light, warm gray for muted backgrounds */
+    --muted-foreground: 30 10% 45%; /* A medium-warm gray for muted text */
+    --accent: 38 60% 65%; /* A warm, muted gold for accents and highlights */
     --accent-foreground: 30 20% 15%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 30 15% 88%; /* #E6E2DE */
+    --border: 30 15% 88%; /* A light, warm gray for borders */
     --input: 30 15% 88%;
     --ring: 215 45% 35%;
     --chart-1: 215 45% 35%; /* primary */
@@ -29,6 +40,7 @@
     --chart-4: 20 40% 55%; /* terracotta */
     --chart-5: 215 25% 55%; /* slate blue */
     --radius: 0.5rem;
+    /* Sidebar specific theme variables */
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 30 20% 15%;
     --sidebar-primary: 215 45% 35%;
@@ -38,20 +50,25 @@
     --sidebar-border: 30 15% 88%;
     --sidebar-ring: 215 45% 35%;
   }
+
+  /*
+   * Defines the color palette for the dark theme.
+   * When the `.dark` class is applied to the `<html>` element, these variables override the defaults.
+   */
   .dark {
-    --background: 30 10% 10%; /* #1C1B1A */
-    --foreground: 39 5% 80%; /* #CFCAC4 */
-    --card: 30 10% 12%; /* #211F1E */
+    --background: 30 10% 10%; /* A very dark, warm gray for the main background */
+    --foreground: 39 5% 80%; /* A light, warm gray for text */
+    --card: 30 10% 12%; /* A slightly lighter dark gray for card backgrounds */
     --card-foreground: 39 5% 80%;
     --popover: 30 10% 10%;
     --popover-foreground: 39 5% 80%;
-    --primary: 215 45% 65%; /* #7C98C9 */
+    --primary: 215 45% 65%; /* A lighter, softer blue for primary actions in dark mode */
     --primary-foreground: 0 0% 98%;
-    --secondary: 30 10% 20%; /* #363330 */
+    --secondary: 30 10% 20%;
     --secondary-foreground: 39 5% 80%;
     --muted: 30 10% 20%;
-    --muted-foreground: 30 5% 55%; /* #918D8A */
-    --accent: 38 60% 55%; /* #C9A25F */
+    --muted-foreground: 30 5% 55%;
+    --accent: 38 60% 55%; /* A rich, antique gold for accents in dark mode */
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
@@ -63,6 +80,7 @@
     --chart-3: 140 25% 45%;
     --chart-4: 20 40% 45%;
     --chart-5: 215 25% 45%;
+    /* Sidebar specific dark theme variables */
     --sidebar-background: 30 10% 12%;
     --sidebar-foreground: 39 5% 80%;
     --sidebar-primary: 215 45% 65%;
@@ -74,11 +92,16 @@
   }
 }
 
+/*
+ * Defines base styles for common HTML elements.
+ */
 @layer base {
   * {
+    /* Sets the default border color for all elements to the theme's border color. */
     @apply border-border;
   }
   body {
+    /* Sets the default background and text color for the entire application. */
     @apply bg-background text-foreground;
   }
 }

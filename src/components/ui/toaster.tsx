@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Toaster component, which renders toasts from the `useToast` hook.
+ * It provides a viewport where all toast notifications will appear.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/toast
+ */
 "use client"
 
 import { useToast } from "@/hooks/use-toast"

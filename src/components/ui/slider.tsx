@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Slider component for selecting a value from a range.
+ * It's built on Radix UI's Slider primitive and styled with Tailwind CSS.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/slider
+ */
 "use client"
 
 import * as React from "react"

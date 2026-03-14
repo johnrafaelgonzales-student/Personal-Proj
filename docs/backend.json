@@ -2,28 +2,28 @@
   "entities": {
     "AdminProfile": {
       "title": "Admin Profile",
-      "description": "Stores profile information for an administrative user.",
+      "description": "Defines the data structure for an administrator's profile. This information is stored when an admin user is created.",
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "description": "The user's unique ID from Firebase Authentication."
+          "description": "The user's unique ID, which must match their Firebase Authentication UID."
         },
         "name": {
           "type": "string",
-          "description": "The admin's full name."
+          "description": "The full name of the administrator."
         },
         "email": {
           "type": "string",
           "format": "email",
-          "description": "The admin's email address."
+          "description": "The administrator's email address, used for identification."
         },
         "role": {
           "type": "string",
           "enum": [
             "admin"
           ],
-          "description": "The role of the user, which is 'admin'."
+          "description": "The user's role, fixed to 'admin' for authorization purposes."
         }
       },
       "required": [
@@ -35,28 +35,28 @@
     },
     "RegisteredVisitorProfile": {
       "title": "Registered Visitor Profile",
-      "description": "Stores profile information for a registered visitor.",
+      "description": "Defines the data structure for a registered visitor's profile. This is created when a visitor logs in or is manually entered.",
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "description": "The user's unique ID from Firebase Authentication."
+          "description": "The user's unique ID, which must match their Firebase Authentication UID if they are a registered user."
         },
         "name": {
           "type": "string",
-          "description": "The visitor's full name."
+          "description": "The full name of the visitor."
         },
         "email": {
           "type": "string",
           "format": "email",
-          "description": "The visitor's email address."
+          "description": "The visitor's email address, used for identification and communication."
         },
         "role": {
           "type": "string",
           "enum": [
             "visitor"
           ],
-          "description": "The role of the user, which is 'visitor'."
+          "description": "The user's role, fixed to 'visitor' for authorization purposes."
         }
       },
       "required": [
@@ -68,21 +68,21 @@
     },
     "VisitorEntry": {
       "title": "Visitor Entry",
-      "description": "Represents a single visitor log entry.",
+      "description": "Defines the data structure for a single visitor log entry, capturing all details of a visit.",
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the visitor entry."
+          "description": "A unique identifier for this specific visitor entry record."
         },
         "timestamp": {
           "type": "string",
           "format": "date-time",
-          "description": "The timestamp of the visit."
+          "description": "The precise date and time when the visit was logged."
         },
         "purpose": {
           "type": "string",
-          "description": "The purpose of the visit (e.g., Research, Study)."
+          "description": "The reason for the visit (e.g., Research, Study, Event)."
         },
         "entryType": {
           "type": "string",
@@ -91,19 +91,19 @@
             "rfid",
             "email"
           ],
-          "description": "The method used for entry."
+          "description": "The method used to log the entry (e.g., manual input, RFID card scan)."
         },
         "registeredVisitorId": {
           "type": "string",
-          "description": "The UID of the registered visitor, if applicable."
+          "description": "The UID of the registered visitor, linking this entry to a specific user profile if applicable."
         },
         "manualEntryVisitorName": {
           "type": "string",
-          "description": "The name of the visitor for manual entries."
+          "description": "The name of the visitor, used specifically for manual entries where a profile might not exist."
         },
         "loggedByAdminUserId": {
           "type": "string",
-          "description": "The UID of the admin who logged the entry, for manual entries."
+          "description": "The UID of the admin who manually created the entry, for auditing purposes."
         }
       },
       "required": [
@@ -117,26 +117,27 @@
   "auth": {
     "providers": [
       "email-password"
-    ]
+    ],
+    "description": "Configures Firebase Authentication to only allow Email/Password sign-in."
   },
   "firestore": {
     "/admins/{adminId}": {
       "schema": {
         "$ref": "#/entities/AdminProfile"
       },
-      "description": "Stores administrator user profiles."
+      "description": "A top-level collection in Firestore to store all administrator user profiles. The document ID for each admin is their Firebase Authentication UID."
     },
     "/registeredVisitors/{visitorId}": {
       "schema": {
         "$ref": "#/entities/RegisteredVisitorProfile"
       },
-      "description": "Stores registered visitor user profiles."
+      "description": "A top-level collection in Firestore to store all registered visitor profiles. The document ID for each visitor is their Firebase Authentication UID."
     },
     "/visitorEntries/{entryId}": {
       "schema": {
         "$ref": "#/entities/VisitorEntry"
       },
-      "description": "Stores all visitor log entries."
+      "description": "A top-level collection in Firestore that serves as the master log for all visitor entries from all sources."
     }
   }
 }

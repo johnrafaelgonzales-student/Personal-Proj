@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Sheet component, a slide-out panel for displaying content from the side of the screen.
+ * It's built on Radix UI's Dialog primitive and styled with Tailwind CSS.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/sheet
+ */
 "use client"
 
 import * as React from "react"

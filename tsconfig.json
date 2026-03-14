@@ -1,27 +1,45 @@
+// This is the TypeScript configuration file for the Next.js project.
 {
   "compilerOptions": {
+    // Specifies the JavaScript version to target during compilation.
     "target": "ES2017",
+    // A list of library files to be included in the compilation.
     "lib": ["dom", "dom.iterable", "esnext"],
+    // Allows JavaScript files to be imported into TypeScript files.
     "allowJs": true,
+    // Skips type checking of all declaration files (*.d.ts).
     "skipLibCheck": true,
+    // Enables all strict type-checking options.
     "strict": true,
+    // Prevents TypeScript from generating output files. Next.js handles this.
     "noEmit": true,
+    // Enables interoperability between CommonJS and ES Modules.
     "esModuleInterop": true,
+    // Specifies the module system for the project.
     "module": "esnext",
+    // Specifies how modules get resolved.
     "moduleResolution": "bundler",
+    // Allows importing .json files as modules.
     "resolveJsonModule": true,
+    // Ensures that each file can be safely transpiled without relying on other imports.
     "isolatedModules": true,
+    // Specifies the JSX factory function to use.
     "jsx": "preserve",
+    // Enables incremental compilation for faster builds.
     "incremental": true,
+    // Configures plugins to enhance the TypeScript development experience.
     "plugins": [
       {
         "name": "next"
       }
     ],
+    // Defines path aliases for easier imports.
     "paths": {
       "@/*": ["./src/*"]
     }
   },
+  // Specifies the files to be included in the compilation.
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  // Specifies the files to be excluded from the compilation.
   "exclude": ["node_modules"]
 }

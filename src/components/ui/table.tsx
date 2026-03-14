@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Defines a set of components for creating styled data tables.
+ * These are wrappers around standard HTML table elements (<table>, <thead>, <tbody>, etc.)
+ * with pre-applied Tailwind CSS classes for consistent styling.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/table
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Checkbox component.
+ * It's a styled checkbox built on Radix UI's Checkbox primitive.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/checkbox
+ */
 "use client"
 
 import * as React from "react"

@@ -1,3 +1,7 @@
+/**
+ * @fileoverview This file defines the `useDoc` hook, a custom React hook for subscribing
+ * to a single Firestore document in real-time.
+ */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -11,12 +15,18 @@ import {
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
+// Defines the return type for the hook.
 interface UseDocReturn<T> {
   data: T | null;
   loading: boolean;
   error: FirestoreError | null;
 }
 
+/**
+ * A custom hook to listen for real-time updates on a single Firestore document.
+ * @param {DocumentReference<T, DocumentData> | null} ref - The Firestore document reference to listen to.
+ * @returns {UseDocReturn<T>} An object containing the document data, loading state, and any errors.
+ */
 export function useDoc<T>(
   ref: DocumentReference<T, DocumentData> | null
 ): UseDocReturn<T> {
@@ -36,6 +46,7 @@ export function useDoc<T>(
     const unsubscribe = onSnapshot(
       ref,
       (snapshot: DocumentSnapshot<T>) => {
+        // If the document exists, set its data. Otherwise, set data to null.
         if (snapshot.exists()) {
           setData(snapshot.data());
         } else {
@@ -45,6 +56,7 @@ export function useDoc<T>(
         setError(null);
       },
       async (err: FirestoreError) => {
+        // If a permission-denied error occurs, emit a custom, more detailed error.
         if (err.code === 'permission-denied') {
           const permissionError = new FirestorePermissionError({
             path: ref.path,
@@ -57,8 +69,9 @@ export function useDoc<T>(
       }
     );
 
+    // Cleanup function to unsubscribe from the listener on unmount.
     return () => unsubscribe();
-  }, [ref]);
+  }, [ref]); // Re-run the effect if the document reference changes.
 
   return { data, loading, error };
 }

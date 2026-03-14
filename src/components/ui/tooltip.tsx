@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Tooltip component for showing information when a user hovers over an element.
+ * It's built on Radix UI's Tooltip primitive and styled with Tailwind CSS.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/tooltip
+ */
 "use client"
 
 import * as React from "react"

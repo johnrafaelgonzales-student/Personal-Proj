@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Card component and its parts (Header, Footer, Title, etc.).
+ * It's a versatile container for grouping related content with a styled background and border.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/card
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

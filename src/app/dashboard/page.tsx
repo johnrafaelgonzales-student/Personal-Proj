@@ -1,3 +1,8 @@
+/**
+ * @fileoverview This file defines the main page for the Admin Dashboard.
+ * It uses a client-side rendered approach ('use client') to manage state for the active view
+ * (Dashboard vs. Visitor Log) and handles the rendering of different sub-components.
+ */
 'use client';
 
 import { useState } from 'react';
@@ -39,16 +44,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+// Defines the possible views available in the admin dashboard.
 type AdminView = 'dashboard' | 'log';
+// Maps view keys to human-readable titles.
 const adminViewTitles: Record<AdminView, string> = {
   dashboard: 'Dashboard',
   log: 'Visitor Log',
 };
 
+/**
+ * The main component for the admin dashboard page.
+ * It manages the layout, including the sidebar and main content area.
+ */
 export default function AdminDashboardPage() {
+  // State to track the currently active view.
   const [activeAdminView, setActiveAdminView] = useState<AdminView>('dashboard');
   const { setTheme } = useTheme();
 
+  // Renders the main content based on the active view state.
   const renderContent = () => {
     switch (activeAdminView) {
       case 'dashboard':
@@ -60,6 +73,7 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Gets the appropriate header title for the current view.
   const getHeaderTitle = () => {
     return adminViewTitles[activeAdminView];
   };

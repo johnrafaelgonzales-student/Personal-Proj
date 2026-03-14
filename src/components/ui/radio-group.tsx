@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the RadioGroup component for a set of checkable buttons, where only one can be selected at a time.
+ * It's built on Radix UI's RadioGroup primitive and styled with Tailwind CSS.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/radio-group
+ */
 "use client"
 
 import * as React from "react"

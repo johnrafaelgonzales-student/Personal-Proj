@@ -1,3 +1,7 @@
+/**
+ * @fileoverview This component renders a paginated table of all visitor logs for the admin.
+ * It includes functionality to view visitor details and to block/unblock visitors.
+ */
 'use client';
 
 import * as React from 'react';
@@ -51,25 +55,32 @@ import { useToast } from '@/hooks/use-toast';
 
 const PAGE_SIZE = 10;
 
+/**
+ * The main component for the admin's visitor log table.
+ */
 export function VisitorLogTable() {
+  // State for managing pagination.
   const [currentPage, setCurrentPage] = React.useState(1);
+  // State to hold all visitor data.
   const [data, setData] = React.useState<Visitor[]>([]);
   const { toast } = useToast();
+  // State to hold the visitor currently being viewed in the details dialog.
   const [selectedVisitor, setSelectedVisitor] = React.useState<Visitor | null>(
     null
   );
 
+  // Effect to load data from local storage on mount and on window focus.
   React.useEffect(() => {
     const loadData = () => setData(getVisitorsFromStore());
     loadData();
 
-    // Reload data when the window gets focus to see new entries from other tabs
     window.addEventListener('focus', loadData);
     return () => {
       window.removeEventListener('focus', loadData);
     };
   }, []);
 
+  // Pagination calculations.
   const totalPages = Math.ceil(data.length / PAGE_SIZE);
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const endIndex = startIndex + PAGE_SIZE;
@@ -83,13 +94,20 @@ export function VisitorLogTable() {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
+  /**
+   * Handles the action of blocking or unblocking a visitor.
+   * @param {string} visitorId - The ID of the visitor.
+   * @param {string} visitorName - The name of the visitor.
+   * @param {boolean} isBlocked - The current blocked status.
+   */
   const handleToggleBlock = (
     visitorId: string,
     visitorName: string,
     isBlocked: boolean
   ) => {
+    // Calls the utility function to update the visitor's status in local storage.
     const updatedVisitors = toggleVisitorBlockStatus(visitorId);
-    setData(updatedVisitors);
+    setData(updatedVisitors); // Refresh the local state to re-render the table.
     toast({
       title: `Visitor ${isBlocked ? 'Unblocked' : 'Blocked'}`,
       description: `${visitorName} has been ${
@@ -168,6 +186,7 @@ export function VisitorLogTable() {
                       {visitor.entryTime.toLocaleString()}
                     </TableCell>
                     <TableCell>
+                      {/* Dropdown menu for actions */}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -235,6 +254,7 @@ export function VisitorLogTable() {
           </Table>
         </CardContent>
         <CardFooter>
+          {/* Pagination controls */}
           <div className="flex w-full items-center justify-between text-xs text-muted-foreground">
             <div>
               Showing{' '}
@@ -267,6 +287,7 @@ export function VisitorLogTable() {
           </div>
         </CardFooter>
       </Card>
+      {/* Dialog for viewing visitor details */}
       <Dialog
         open={!!selectedVisitor}
         onOpenChange={(isOpen) => !isOpen && setSelectedVisitor(null)}

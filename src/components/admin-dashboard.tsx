@@ -1,5 +1,11 @@
+/**
+ * @fileoverview This component renders the main dashboard for the admin user.
+ * It includes several charts for visualizing visitor data, a date range picker for filtering,
+ * and functionality to download visitor reports as PDFs.
+ */
 'use client';
 
+import React from 'react';
 import {
   Bar,
   BarChart,
@@ -15,6 +21,12 @@ import {
   Line,
 } from 'recharts';
 import { CalendarDays, Download } from 'lucide-react';
+import { DateRange } from 'react-day-picker';
+import { addDays, format } from 'date-fns';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import html2canvas from 'html2canvas';
+
 import {
   Card,
   CardContent,
@@ -27,27 +39,24 @@ import {
   ChartTooltipContent,
   ChartContainer,
 } from '@/components/ui/chart';
-import { getVisitorsFromStore } from '@/lib/data';
-import type { Visitor } from '@/lib/types';
-import { TrendAnalysis } from './trend-analysis';
 import { Button } from './ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Calendar } from './ui/calendar';
-import React from 'react';
-import { DateRange } from 'react-day-picker';
-import { addDays, format } from 'date-fns';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import html2canvas from 'html2canvas';
+import { TrendAnalysis } from './trend-analysis';
+import { getVisitorsFromStore } from '@/lib/data';
+import type { Visitor } from '@/lib/types';
 
+
+// Colors for the pie chart segments.
 const PIE_COLORS = ['#314F80', '#D9B377', '#77A583', '#B87B5C', '#6B82A5', '#A48F7B', '#8A9A5B'];
 
+// Configuration for chart colors and labels.
 const chartConfig = {
   visitors: {
     label: 'Visitors',
@@ -55,13 +64,19 @@ const chartConfig = {
   },
 };
 
+/**
+ * The main component for the admin's statistical dashboard.
+ */
 export function AdminDashboard() {
+  // State for the date range picker. Defaults to the last 7 days.
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: addDays(new Date(), -6),
     to: new Date(),
   });
+  // State to hold all visitor data, fetched from local storage.
   const [allVisitors, setAllVisitors] = React.useState<Visitor[]>([]);
 
+  // Effect to load visitor data on component mount and when the window gains focus.
   React.useEffect(() => {
     const loadData = () => setAllVisitors(getVisitorsFromStore());
     loadData();
@@ -72,10 +87,11 @@ export function AdminDashboard() {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
+  // Memoized calculation for today's visitor data, aggregated by hour.
   const dailyData = React.useMemo(
     () =>
       Array.from({ length: 10 }, (_, i) => {
-        const hour = i + 8;
+        const hour = i + 8; // From 8 AM to 5 PM
         return {
           name: `${hour % 12 === 0 ? 12 : hour % 12}${
             hour < 12 ? 'AM' : 'PM'
@@ -94,6 +110,7 @@ export function AdminDashboard() {
     [allVisitors, today]
   );
 
+  // Memoized calculation for this week's visitor data, aggregated by day of the week.
   const weeklyData = React.useMemo(() => {
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const startOfWeek = new Date(today);
@@ -107,32 +124,18 @@ export function AdminDashboard() {
           name: day,
           visitors: allVisitors.filter((v) => {
             const entryDate = new Date(v.entryTime);
-            const entryDay = new Date(
-              entryDate.getFullYear(),
-              entryDate.getMonth(),
-              entryDate.getDate()
-            );
-            const startDay = new Date(
-              startOfWeek.getFullYear(),
-              startOfWeek.getMonth(),
-              startOfWeek.getDate()
-            );
-            const endDay = new Date(
-              endOfWeek.getFullYear(),
-              endOfWeek.getMonth(),
-              endOfWeek.getDate()
-            );
             return (
-              entryDay >= startDay &&
-              entryDay <= endDay &&
+              entryDate >= startOfWeek &&
+              entryDate <= endOfWeek &&
               entryDate.getDay() === index
             );
           }).length,
         };
       })
-      .filter((d) => d.visitors > 0);
+      .filter((d) => d.visitors > 0); // Only include days with visitors
   }, [allVisitors, today]);
 
+  // Memoized calculation for this month's visitor data, aggregated by day of the month.
   const monthlyData = React.useMemo(() => {
     const daysInMonth = new Date(
       today.getFullYear(),
@@ -155,6 +158,7 @@ export function AdminDashboard() {
     });
   }, [allVisitors, today]);
 
+  // Memoized calculation for the main traffic chart, based on the selected date range.
   const trafficChartData = React.useMemo(() => {
     if (!date?.from) return [];
     const data = [];
@@ -175,6 +179,10 @@ export function AdminDashboard() {
     return data;
   }, [allVisitors, date]);
 
+  /**
+   * Handles the PDF download functionality.
+   * @param {'daily' | 'weekly' | 'monthly' | 'full'} reportType - The type of report to generate.
+   */
   const handleDownload = async (
     reportType: 'daily' | 'weekly' | 'monthly' | 'full'
   ) => {
@@ -187,20 +195,24 @@ export function AdminDashboard() {
       16
     );
 
+    // Helper function to capture an HTML element as an image and add it to the PDF.
     const addChartToPdf = async (doc: jsPDF, elementId: string, title: string, y: number) => {
         const element = document.getElementById(elementId);
         if (!element) return y;
     
+        // Use html2canvas to render the element to a canvas.
         const canvas = await html2canvas(element, {
-            scale: 1,
+            scale: 1, // Use a lower scale for smaller file size
             useCORS: true,
-            backgroundColor: 'white'
+            backgroundColor: 'white' // Set a background color for transparency
         });
-        const imgData = canvas.toDataURL('image/jpeg', 0.75);
+        // Convert canvas to a lower quality JPEG to reduce file size.
+        const imgData = canvas.toDataURL('image/jpeg', 0.75); 
         const pdfWidth = doc.internal.pageSize.getWidth();
         const imgHeight = (canvas.height * (pdfWidth - 28)) / canvas.width;
         
         let newY = y;
+        // Add a new page if the chart doesn't fit.
         if (y + imgHeight > doc.internal.pageSize.getHeight() - 20) {
             doc.addPage();
             newY = 15;
@@ -216,6 +228,7 @@ export function AdminDashboard() {
       doc.text('Charts', 14, yPos);
       yPos += 10;
   
+      // Add each chart to the PDF.
       yPos = await addChartToPdf(doc, 'daily-chart-card', "Today's Visitors", yPos);
       yPos = await addChartToPdf(doc, 'weekly-chart-card', "This Week's Visitors", yPos);
       yPos = await addChartToPdf(doc, 'monthly-chart-card', "This Month's Visitors", yPos);
@@ -223,15 +236,13 @@ export function AdminDashboard() {
       
       doc.addPage();
 
+    // Filter visitor data based on the selected report type.
     let dataToExport: Visitor[] = [];
     const now = new Date();
 
     switch (reportType) {
       case 'daily':
-        dataToExport = allVisitors.filter((v) => {
-          const entryDate = new Date(v.entryTime);
-          return entryDate.toDateString() === now.toDateString();
-        });
+        dataToExport = allVisitors.filter((v) => new Date(v.entryTime).toDateString() === now.toDateString());
         break;
       case 'weekly':
         const startOfWeek = new Date(now);
@@ -240,25 +251,17 @@ export function AdminDashboard() {
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6);
         endOfWeek.setHours(23, 59, 59, 999);
-        dataToExport = allVisitors.filter((v) => {
-          const entryDate = new Date(v.entryTime);
-          return entryDate >= startOfWeek && entryDate <= endOfWeek;
-        });
+        dataToExport = allVisitors.filter((v) => new Date(v.entryTime) >= startOfWeek && new Date(v.entryTime) <= endOfWeek);
         break;
       case 'monthly':
-        dataToExport = allVisitors.filter((v) => {
-          const entryDate = new Date(v.entryTime);
-          return (
-            entryDate.getMonth() === now.getMonth() &&
-            entryDate.getFullYear() === now.getFullYear()
-          );
-        });
+        dataToExport = allVisitors.filter((v) => new Date(v.entryTime).getMonth() === now.getMonth() && new Date(v.entryTime).getFullYear() === now.getFullYear());
         break;
       case 'full':
         dataToExport = allVisitors;
         break;
     }
 
+    // Use jspdf-autotable to create a table of the filtered visitor data.
     (doc as any).autoTable({
       head: [['Name', 'Purpose', 'College/Office', 'Entry Time', 'Entry Type']],
       body: dataToExport.map((v) => [
@@ -271,14 +274,14 @@ export function AdminDashboard() {
       startY: 20,
     });
 
-    doc.save(
-      `libflow-report-${reportType}-${new Date().toISOString().split('T')[0]}.pdf`
-    );
+    // Save the generated PDF.
+    doc.save(`libflow-report-${reportType}-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   return (
     <div className="grid gap-4 md:gap-6">
       <div className="grid gap-4 md:grid-cols-3">
+        {/* Card for Today's Visitors Bar Chart */}
         <Card id="daily-chart-card">
           <CardHeader>
             <CardTitle className="text-base font-medium">
@@ -288,39 +291,19 @@ export function AdminDashboard() {
           <CardContent>
             <ChartContainer config={chartConfig} className="h-48 w-full">
               <ResponsiveContainer>
-                <BarChart
-                  data={dailyData}
-                  margin={{ top: 0, right: 0, left: -20, bottom: -10 }}
-                >
+                <BarChart data={dailyData} margin={{ top: 0, right: 0, left: -20, bottom: -10 }}>
                   <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="name"
-                    tickLine={false}
-                    tickMargin={10}
-                    axisLine={false}
-                    fontSize={10}
-                  />
-                  <YAxis
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={10}
-                    allowDecimals={false}
-                    fontSize={12}
-                  />
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent indicator="dot" />}
-                  />
-                  <Bar
-                    dataKey="visitors"
-                    fill="var(--color-visitors)"
-                    radius={4}
-                  />
+                  <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
+                  <YAxis tickLine={false} axisLine={false} tickMargin={10} allowDecimals={false} fontSize={12} />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                  <Bar dataKey="visitors" fill="var(--color-visitors)" radius={4} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
+
+        {/* Card for This Week's Visitors Pie Chart */}
         <Card id="weekly-chart-card">
           <CardHeader>
             <CardTitle className="text-base font-medium">
@@ -331,42 +314,20 @@ export function AdminDashboard() {
             <ChartContainer config={chartConfig} className="h-48 w-full">
               <ResponsiveContainer>
                 <PieChart>
-                  <Pie
-                    data={weeklyData}
-                    dataKey="visitors"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={30}
-                    outerRadius={50}
-                    paddingAngle={2}
-                  >
+                  <Pie data={weeklyData} dataKey="visitors" nameKey="name" cx="50%" cy="50%" innerRadius={30} outerRadius={50} paddingAngle={2}>
                     {weeklyData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={PIE_COLORS[index % PIE_COLORS.length]}
-                      />
+                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                     ))}
                   </Pie>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                  />
-                  <Legend
-                    layout="vertical"
-                    align="right"
-                    verticalAlign="middle"
-                    iconSize={10}
-                    wrapperStyle={{
-                      fontSize: '12px',
-                      paddingLeft: '10px',
-                    }}
-                  />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                  <Legend layout="vertical" align="right" verticalAlign="middle" iconSize={10} wrapperStyle={{ fontSize: '12px', paddingLeft: '10px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
+
+        {/* Card for This Month's Visitors Line Chart */}
         <Card id="monthly-chart-card">
           <CardHeader>
             <CardTitle className="text-base font-medium">
@@ -376,43 +337,20 @@ export function AdminDashboard() {
           <CardContent>
             <ChartContainer config={chartConfig} className="h-48 w-full">
               <ResponsiveContainer>
-                <LineChart
-                  data={monthlyData}
-                  margin={{ top: 5, right: 10, left: -20, bottom: -10 }}
-                >
+                <LineChart data={monthlyData} margin={{ top: 5, right: 10, left: -20, bottom: -10 }}>
                   <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="name"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={10}
-                    fontSize={10}
-                    interval={6}
-                  />
-                  <YAxis
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={10}
-                    allowDecimals={false}
-                    fontSize={12}
-                  />
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent indicator="dot" />}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="visitors"
-                    stroke="var(--color-visitors)"
-                    strokeWidth={2}
-                    dot={false}
-                  />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={10} fontSize={10} interval={6} />
+                  <YAxis tickLine={false} axisLine={false} tickMargin={10} allowDecimals={false} fontSize={12} />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                  <Line type="monotone" dataKey="visitors" stroke="var(--color-visitors)" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
       </div>
+
+      {/* Main Visitor Traffic Chart */}
       <Card id="traffic-chart-card">
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -423,13 +361,10 @@ export function AdminDashboard() {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
+              {/* Date Range Picker */}
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    id="date"
-                    variant={'outline'}
-                    className="w-[300px] justify-start text-left font-normal"
-                  >
+                  <Button id="date" variant={'outline'} className="w-[300px] justify-start text-left font-normal">
                     <CalendarDays className="mr-2 h-4 w-4" />
                     {date?.from ? (
                       date.to ? (
@@ -446,16 +381,10 @@ export function AdminDashboard() {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="end">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={date?.from}
-                    selected={date}
-                    onSelect={setDate}
-                    numberOfMonths={2}
-                  />
+                  <Calendar initialFocus mode="range" defaultMonth={date?.from} selected={date} onSelect={setDate} numberOfMonths={2} />
                 </PopoverContent>
               </Popover>
+              {/* Download Report Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon">
@@ -464,18 +393,10 @@ export function AdminDashboard() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleDownload('daily')}>
-                    Daily Report
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDownload('weekly')}>
-                    Weekly Report
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDownload('monthly')}>
-                    Monthly Report
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDownload('full')}>
-                    Full Report
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload('daily')}>Daily Report</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload('weekly')}>Weekly Report</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload('monthly')}>Monthly Report</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload('full')}>Full Report</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -486,34 +407,17 @@ export function AdminDashboard() {
             <ResponsiveContainer>
               <BarChart data={trafficChartData}>
                 <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  tickFormatter={(value) => value}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={10}
-                  allowDecimals={false}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="dot" />}
-                />
-                <Bar
-                  dataKey="visitors"
-                  fill="var(--color-visitors)"
-                  radius={4}
-                />
+                <XAxis dataKey="date" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
+                <YAxis tickLine={false} axisLine={false} tickMargin={10} allowDecimals={false} />
+                <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                <Bar dataKey="visitors" fill="var(--color-visitors)" radius={4} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
         </CardContent>
       </Card>
 
+      {/* AI-powered Trend Analysis Component */}
       <TrendAnalysis />
     </div>
   );

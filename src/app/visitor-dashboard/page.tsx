@@ -1,3 +1,7 @@
+/**
+ * @fileoverview This page displays the dashboard for a logged-in visitor.
+ * It shows a welcome message and a table of the visitor's past library visits.
+ */
 'use client';
 
 import { Suspense } from 'react';
@@ -23,11 +27,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+/**
+ * The main content of the visitor dashboard. It extracts user info from URL search parameters.
+ */
 function VisitorDashboardContent() {
   const searchParams = useSearchParams();
+  // Get the visitor's name and college from the URL, with fallbacks.
   const name = searchParams.get('name') || mockUser.name;
   const college = searchParams.get('college') || '';
 
+  // Utility function to generate initials from a name string for the avatar fallback.
   const getInitials = (nameStr: string) => {
     const cleanedName = nameStr.replace(',', '');
     const parts = cleanedName.split(' ').filter(Boolean);
@@ -101,6 +110,7 @@ function VisitorDashboardContent() {
               </CardDescription>
             </CardHeader>
           </Card>
+          {/* Renders the table with the visitor's specific history. */}
           <VisitorHistoryTable visitorName={name} college={college} />
         </div>
       </main>
@@ -108,6 +118,9 @@ function VisitorDashboardContent() {
   );
 }
 
+/**
+ * Main export for the visitor dashboard, wrapped in Suspense to handle loading of URL parameters.
+ */
 export default function VisitorDashboardPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>

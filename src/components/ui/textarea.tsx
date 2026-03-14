@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Textarea component for multi-line text input.
+ * It's a standard HTML textarea element with pre-applied Tailwind CSS classes for consistent styling.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/textarea
+ */
 import * as React from 'react';
 
 import {cn} from '@/lib/utils';

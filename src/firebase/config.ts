@@ -1,5 +1,9 @@
-// Your web app's Firebase configuration
-// IMPORTANT: Replace this with your actual Firebase config
+/**
+ * @fileoverview This file contains the Firebase configuration object for the web app.
+ * It reads environment variables to securely store and access your project's Firebase keys.
+ * IMPORTANT: Replace the placeholder values in your `.env` file with your actual Firebase project configuration.
+ */
+
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,

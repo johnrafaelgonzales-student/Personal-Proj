@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Defines the AlertDialog component and its parts.
+ * This is a modal dialog that interrupts the user with important information or a decision.
+ * It's built on top of Radix UI's AlertDialog primitive and styled with Tailwind CSS.
+ * It's part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/alert-dialog
+ */
 "use client"
 
 import * as React from "react"

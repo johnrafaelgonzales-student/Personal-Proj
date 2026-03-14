@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the DropdownMenu component, which displays a menu of actions or options to the user.
+ * It's built on Radix UI's DropdownMenu primitive and is styled with Tailwind CSS.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/dropdown-menu
+ */
 "use client"
 
 import * as React from "react"

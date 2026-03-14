@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Tabs component for organizing content into switchable views.
+ * It's built on Radix UI's Tabs primitive and styled with Tailwind CSS.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/tabs
+ */
 "use client"
 
 import * as React from "react"

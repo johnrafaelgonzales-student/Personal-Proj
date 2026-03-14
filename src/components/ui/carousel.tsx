@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Carousel component for creating swipeable content sliders.
+ * It is built using the `embla-carousel-react` library and provides navigation controls.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/carousel
+ */
 "use client"
 
 import * as React from "react"

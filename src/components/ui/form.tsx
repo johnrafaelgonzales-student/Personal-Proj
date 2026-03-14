@@ -1,3 +1,10 @@
+/**
+ * @fileoverview This file provides a set of components for building forms with `react-hook-form`.
+ * It includes a FormProvider and components for fields, labels, controls, and error messages,
+ * which are all integrated with the form's state.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/form
+ */
 "use client"
 
 import * as React from "react"

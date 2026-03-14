@@ -1,3 +1,8 @@
+/**
+ * @fileoverview This component provides a UI for the AI-powered visitor trend analysis.
+ * It includes a button to trigger the analysis, handles loading and error states,
+ * and displays the results received from the Genkit AI flow.
+ */
 'use client';
 
 import { useState } from 'react';
@@ -10,24 +15,36 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { mockVisitors } from '@/lib/data';
+import { mockVisitors } from '@/lib/data'; // Uses mock data for the analysis
 import { Skeleton } from './ui/skeleton';
 
+/**
+ * The main component for the trend analysis feature.
+ */
 export function TrendAnalysis() {
+  // State to store the analysis results from the AI.
   const [analysis, setAnalysis] = useState<AnalyzeVisitorTrendsOutput | null>(null);
+  // State to manage the loading indicator while the AI is processing.
   const [isLoading, setIsLoading] = useState(false);
+  // State to store any potential errors during the analysis.
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Handles the click event of the "Analyze Trends" button.
+   * It prepares the data, calls the AI flow, and updates the state with the result.
+   */
   const handleAnalyze = async () => {
     setIsLoading(true);
     setError(null);
     setAnalysis(null);
     try {
+      // Prepares the mock visitor data into the format expected by the AI flow.
       const visitorData = mockVisitors.map((v) => ({
         id: v.id,
         timestamp: v.entryTime.toISOString(),
       }));
 
+      // Calls the Genkit flow to analyze the data.
       const result = await analyzeVisitorTrends({ visitorData });
       setAnalysis(result);
     } catch (e) {
@@ -58,6 +75,7 @@ export function TrendAnalysis() {
           </Button>
         </div>
       </CardHeader>
+      {/* Conditionally renders content based on the loading/result state. */}
       {(isLoading || analysis || error) && (
         <CardContent>
             {isLoading && <AnalysisSkeleton />}
@@ -92,7 +110,9 @@ export function TrendAnalysis() {
   );
 }
 
-
+/**
+ * A skeleton component to show a loading state while the analysis is in progress.
+ */
 function AnalysisSkeleton() {
     return (
         <div className="space-y-4">

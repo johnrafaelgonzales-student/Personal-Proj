@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Defines a set of chart components that act as wrappers around the `recharts` library.
+ * These components provide a consistent styling and theming mechanism for charts across the application,
+ * integrating with the app's overall light/dark mode theme.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/charts
+ */
 "use client"
 
 import * as React from "react"
@@ -5,9 +12,10 @@ import * as RechartsPrimitive from "recharts"
 
 import { cn } from "@/lib/utils"
 
-// Format: { THEME_NAME: CSS_SELECTOR }
+// Defines the CSS selectors for light and dark themes.
 const THEMES = { light: "", dark: ".dark" } as const
 
+// Defines the shape of the configuration object for charts.
 export type ChartConfig = {
   [k in string]: {
     label?: React.ReactNode
@@ -67,6 +75,7 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+// A component to dynamically generate and inject CSS for chart colors.
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -102,6 +111,7 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
+// A custom tooltip component for charts with consistent styling.
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof RechartsPrimitive.Tooltip> &

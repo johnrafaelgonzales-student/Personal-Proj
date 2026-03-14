@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the styled Input component for text entry.
+ * It's a standard HTML input element with pre-applied Tailwind CSS classes for consistent styling.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/input
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

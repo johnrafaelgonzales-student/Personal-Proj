@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the Calendar component for selecting dates and date ranges.
+ * It is a wrapper around the `react-day-picker` library, styled to match the app's theme.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/calendar
+ */
 "use client"
 
 import * as React from "react"

@@ -1,3 +1,7 @@
+/**
+ * @fileoverview This component provides a dialog form for admins to manually log a visitor entry.
+ * It includes fields for the visitor's email, purpose of visit, and college/department.
+ */
 'use client';
 
 import * as React from 'react';
@@ -37,10 +41,12 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { addVisitorToStore, colleges, offices } from '@/lib/data';
 
+// Zod schema for form validation.
 const formSchema = z.object({
   email: z
     .string()
     .email({ message: 'Please enter a valid email.' })
+    // Ensures the email is an institutional one.
     .refine((email) => email.endsWith('@neu.edu.ph'), {
       message: 'Please use an institutional @neu.edu.ph email.',
     }),
@@ -48,6 +54,11 @@ const formSchema = z.object({
   college: z.string({ required_error: 'Please select a college/office.' }),
 });
 
+/**
+ * Converts an email like "juan.delacruz@neu.edu.ph" to "Delacruz, Juan".
+ * @param {string} email The visitor's email address.
+ * @returns {string} The formatted name.
+ */
 const emailToName = (email: string): string => {
   if (!email.includes('@')) return email;
   const emailUser = email.split('@')[0];
@@ -61,11 +72,19 @@ const emailToName = (email: string): string => {
   return nameParts[0] || '';
 };
 
+/**
+ * The main component for the manual entry form, wrapped in a dialog.
+ * @param {object} props - Component props.
+ * @param {React.ReactNode} props.children - The trigger element for the dialog.
+ */
 export function ManualEntryForm({ children }: { children: React.ReactNode }) {
+  // State to control the dialog's open/closed status.
   const [open, setOpen] = React.useState(false);
+  // State to handle the submission loading indicator.
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { toast } = useToast();
 
+  // React Hook Form setup.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -75,16 +94,23 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
     },
   });
 
+  /**
+   * Handles the form submission.
+   * @param {z.infer<typeof formSchema>} values - The validated form values.
+   */
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     
+    // Derives the name from the email.
     const derivedName = emailToName(values.email);
+    // Adds the new visitor entry to the local storage "database".
     addVisitorToStore({
       name: derivedName,
       purpose: values.purpose,
       college: values.college,
     });
 
+    // Simulate network delay.
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     setIsSubmitting(false);
@@ -112,6 +138,7 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-4 py-4"
           >
+            {/* Email Input Field */}
             <FormField
               control={form.control}
               name="email"
@@ -128,6 +155,7 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
                 </FormItem>
               )}
             />
+            {/* Purpose of Visit Select Field */}
             <FormField
               control={form.control}
               name="purpose"
@@ -157,6 +185,7 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
                 </FormItem>
               )}
             />
+            {/* College/Office Select Field */}
             <FormField
               control={form.control}
               name="college"

@@ -1,8 +1,15 @@
+/**
+ * @fileoverview Defines the Alert component for displaying important messages.
+ * It supports different variants, like 'default' and 'destructive'.
+ * This component is part of the ShadCN UI library.
+ * @see https://ui.shadcn.com/docs/components/alert
+ */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+// Defines the CSS variants for the alert component.
 const alertVariants = cva(
   "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
   {

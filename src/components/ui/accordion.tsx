@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Defines the Accordion component and its parts (Item, Trigger, Content).
+ * This component is a wrapper around the Radix UI Accordion primitive, styled with
+ * Tailwind CSS to match the application's theme. It's part of the ShadCN UI library.
+ * It allows for collapsible sections of content.
+ * @see https://ui.shadcn.com/docs/components/accordion
+ */
 "use client"
 
 import * as React from "react"
