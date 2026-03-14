@@ -21,14 +21,22 @@ import {
 import { getVisitorsFromStore } from '@/lib/data';
 import type { Visitor } from '@/lib/types';
 
-export function VisitorHistoryTable({ visitorName }: { visitorName: string }) {
+export function VisitorHistoryTable({
+  visitorName,
+  college,
+}: {
+  visitorName: string;
+  college: string;
+}) {
   const [visitorHistory, setVisitorHistory] = React.useState<Visitor[]>([]);
 
   React.useEffect(() => {
     const loadData = () => {
       const allVisitors = getVisitorsFromStore();
       const history = allVisitors.filter(
-        (v) => v.name.toLowerCase() === visitorName.toLowerCase()
+        (v) =>
+          v.name.toLowerCase() === visitorName.toLowerCase() &&
+          v.college === college
       );
       setVisitorHistory(history);
     };
@@ -38,7 +46,7 @@ export function VisitorHistoryTable({ visitorName }: { visitorName: string }) {
     return () => {
       window.removeEventListener('focus', loadData);
     };
-  }, [visitorName]);
+  }, [visitorName, college]);
 
   return (
     <Card>

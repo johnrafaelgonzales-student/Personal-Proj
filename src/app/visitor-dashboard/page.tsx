@@ -26,6 +26,7 @@ import {
 function VisitorDashboardContent() {
   const searchParams = useSearchParams();
   const name = searchParams.get('name') || mockUser.name;
+  const college = searchParams.get('college') || '';
 
   const getInitials = (nameStr: string) => {
     const cleanedName = nameStr.replace(',', '');
@@ -100,7 +101,7 @@ function VisitorDashboardContent() {
               </CardDescription>
             </CardHeader>
           </Card>
-          <VisitorHistoryTable visitorName={name} />
+          <VisitorHistoryTable visitorName={name} college={college} />
         </div>
       </main>
     </div>

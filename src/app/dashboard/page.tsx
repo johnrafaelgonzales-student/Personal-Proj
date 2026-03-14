@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 import {
   BookCopy,
   BookOpenCheck,
@@ -9,6 +10,8 @@ import {
   PlusCircle,
   Settings,
   LogOut,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 import {
@@ -36,7 +39,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-
 type AdminView = 'dashboard' | 'log';
 const adminViewTitles: Record<AdminView, string> = {
   dashboard: 'Dashboard',
@@ -45,6 +47,7 @@ const adminViewTitles: Record<AdminView, string> = {
 
 export default function AdminDashboardPage() {
   const [activeAdminView, setActiveAdminView] = useState<AdminView>('dashboard');
+  const { setTheme } = useTheme();
 
   const renderContent = () => {
     switch (activeAdminView) {
@@ -100,14 +103,29 @@ export default function AdminDashboardPage() {
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <SidebarMenuButton>
                 <Settings />
                 <span>Settings</span>
               </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="center">
+              <DropdownMenuLabel>Theme</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => setTheme('light')}>
+                <Sun className="mr-2 h-4 w-4" />
+                Light
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('dark')}>
+                <Moon className="mr-2 h-4 w-4" />
+                Dark
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('system')}>
+                <Settings className="mr-2 h-4 w-4" />
+                System
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>

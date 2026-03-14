@@ -95,7 +95,7 @@ export function ManualLoginForm() {
         title: 'Entry Logged!',
         description: `Welcome, ${derivedName}. Your visit has been recorded.`,
       });
-      router.push(`/visitor-dashboard?name=${encodeURIComponent(derivedName)}`);
+      router.push(`/visitor-dashboard?name=${encodeURIComponent(derivedName)}&college=${encodeURIComponent(visitorValues.college)}`);
     }
   }
 
