@@ -46,15 +46,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
 
-const PIE_COLORS = [
-  '#0ea5e9',
-  '#84cc16',
-  '#f97316',
-  '#eab308',
-  '#d946ef',
-  '#14b8a6',
-  '#f43f5e',
-];
+const PIE_COLORS = ['#314F80', '#D9B377', '#77A583', '#B87B5C', '#6B82A5', '#A48F7B', '#8A9A5B'];
 
 const chartConfig = {
   visitors: {

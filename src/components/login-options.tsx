@@ -23,10 +23,10 @@ export function LoginOptions() {
   };
 
   return (
-    <Card className="w-full max-w-md bg-white/10 backdrop-blur-sm border-white/20">
+    <Card className="w-full max-w-md bg-background/80 backdrop-blur-md">
       <CardHeader>
-        <CardTitle className="text-center text-2xl capitalize text-white">{role} Login</CardTitle>
-        <CardDescription className="text-center text-gray-300">
+        <CardTitle className="text-center text-2xl capitalize text-foreground">{role} Login</CardTitle>
+        <CardDescription className="text-center text-muted-foreground">
           Please select your login method.
         </CardDescription>
       </CardHeader>
@@ -35,7 +35,7 @@ export function LoginOptions() {
           <Fingerprint className="mr-2 h-5 w-5" />
           Tap RFID Card
         </Button>
-        <Button size="lg" variant="outline" className="w-full border-primary text-primary-foreground hover:bg-primary/10" onClick={handleManualEntry}>
+        <Button size="lg" variant="outline" className="w-full border-primary text-primary hover:bg-primary/10" onClick={handleManualEntry}>
            <Contact className="mr-2 h-5 w-5" />
            Manual Entry
         </Button>

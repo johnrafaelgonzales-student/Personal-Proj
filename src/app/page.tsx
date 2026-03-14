@@ -19,17 +19,16 @@ export default function RoleSelectionPage() {
         data-ai-hint="library books"
       />
       <div className="absolute inset-0 bg-black/60" />
-      <Card className="relative w-full max-w-md border-white/20 bg-accent/20 backdrop-blur-sm">
+      <Card className="relative w-full max-w-md bg-background/80 backdrop-blur-md">
         <CardHeader>
-          <CardTitle className="text-center text-3xl font-bold [text-shadow:0_0_8px_hsl(var(--accent))]">
+          <CardTitle className="text-center text-3xl font-bold text-foreground [text-shadow:0_0_8px_hsl(var(--accent))]">
             Welcome to NEU Library
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4 p-6">
           <Button
             size="lg"
-            variant="outline"
-            className="w-full border-primary text-primary-foreground hover:bg-primary/10"
+            className="w-full"
             onClick={() => router.push('/login?role=admin')}
           >
             <Shield className="mr-2 h-5 w-5" />
@@ -37,7 +36,8 @@ export default function RoleSelectionPage() {
           </Button>
           <Button
             size="lg"
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+            variant="outline"
+            className="w-full border-primary text-primary hover:bg-primary/10"
             onClick={() => router.push('/login?role=visitor')}
           >
             <User className="mr-2 h-5 w-5" />

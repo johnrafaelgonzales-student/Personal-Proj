@@ -5,7 +5,7 @@ import { ManualLoginForm } from '@/components/manual-login-form';
 
 function ManualLoginPageContent() {
     return (
-        <div className="relative flex h-screen w-full items-center justify-center text-white">
+        <div className="relative flex h-screen w-full items-center justify-center">
              <Image
                 src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=2070&auto=format&fit=crop"
                 alt="Person reading in a library"

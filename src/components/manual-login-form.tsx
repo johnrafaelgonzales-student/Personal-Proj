@@ -100,10 +100,10 @@ export function ManualLoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md bg-white/10 backdrop-blur-sm border-white/20 text-white">
+    <Card className="w-full max-w-md bg-background/80 backdrop-blur-md text-foreground">
       <CardHeader>
         <CardTitle className="text-center text-2xl capitalize">Manual {role} Entry</CardTitle>
-        <CardDescription className="text-center text-gray-300">
+        <CardDescription className="text-center text-muted-foreground">
           {is_admin ? 'Please enter your credentials.' : 'Please enter your details.'}
         </CardDescription>
       </CardHeader>
@@ -119,7 +119,7 @@ export function ManualLoginForm() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="admin@example.com" {...field} className="bg-white/20 border-white/30 placeholder:text-gray-400" />
+                        <Input placeholder="admin@example.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -132,7 +132,7 @@ export function ManualLoginForm() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="********" {...field} className="bg-white/20 border-white/30 placeholder:text-gray-400"/>
+                        <Input type="password" placeholder="********" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -152,7 +152,7 @@ export function ManualLoginForm() {
                             type="email" 
                             placeholder="juan.delacruz@neu.edu.ph" 
                             {...field} 
-                            className="bg-white/20 border-white/30 placeholder:text-gray-400" />
+                            />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -166,7 +166,7 @@ export function ManualLoginForm() {
                       <FormLabel>Purpose of Visit</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="bg-white/20 border-white/30">
+                          <SelectTrigger>
                             <SelectValue placeholder="Select a purpose" />
                           </SelectTrigger>
                         </FormControl>
@@ -193,7 +193,7 @@ export function ManualLoginForm() {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-white/20 border-white/30">
+                          <SelectTrigger>
                             <SelectValue placeholder="Select your department/office" />
                           </SelectTrigger>
                         </FormControl>
@@ -227,7 +227,7 @@ export function ManualLoginForm() {
             <Button type="submit" disabled={isSubmitting} className="w-full bg-primary hover:bg-primary/90">
               {isSubmitting ? <Loader2 className="animate-spin" /> : is_admin ? 'Log In' : 'Log Visit'}
             </Button>
-            <Button type="button" variant="ghost" className="w-full hover:bg-white/20" onClick={() => router.back()}>
+            <Button type="button" variant="ghost" className="w-full" onClick={() => router.back()}>
                 Cancel
             </Button>
           </form>
