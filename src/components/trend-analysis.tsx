@@ -61,7 +61,9 @@ export function TrendAnalysis({ visitors }: { visitors: Visitor[] }) {
       }));
 
       // Calls the Genkit flow to analyze the data.
-      const result = await analyzeVisitorTrends({ visitorData });
+      const result = await analyzeVisitorTrends({
+        visitorDataJson: JSON.stringify(visitorData),
+      });
       setAnalysis(result);
     } catch (e) {
       setError('Failed to analyze trends. Please try again.');
