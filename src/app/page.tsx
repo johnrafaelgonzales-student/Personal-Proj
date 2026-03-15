@@ -163,7 +163,7 @@ export default function LandingPage() {
                   Collaborate effectively in our dedicated discussion rooms.
                   These spaces are equipped with whiteboards and are ideal for
                   group projects, study sessions, and brainstorming meetings.
-                  You can book a room to ensure your group has a private,
+                  You can use the room to ensure your group has a private,
                   productive environment to work on presentations, debate
                   ideas, and achieve your collective academic goals.
                 </p>
