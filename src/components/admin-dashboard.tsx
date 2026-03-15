@@ -48,7 +48,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import { TrendAnalysis } from './trend-analysis';
 import { getVisitorsFromStore } from '@/lib/data';
 import type { Visitor } from '@/lib/types';
 
@@ -416,9 +415,6 @@ export function AdminDashboard() {
           </ChartContainer>
         </CardContent>
       </Card>
-
-      {/* AI-powered Trend Analysis Component */}
-      <TrendAnalysis visitors={allVisitors} />
     </div>
   );
 }

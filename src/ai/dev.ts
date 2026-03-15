@@ -5,6 +5,3 @@
  */
 import { config } from 'dotenv';
 config();
-
-// This import registers the `adminAnalyzeVisitorTrends` flow with the Genkit framework.
-import '@/ai/flows/admin-analyze-visitor-trends.ts';
