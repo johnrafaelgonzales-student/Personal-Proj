@@ -31,7 +31,14 @@ export default function LandingPage() {
       {/* Header */}
       <header className="sticky top-0 z-20 w-full bg-sky-600 shadow-md">
         <div className="container mx-auto flex items-center justify-between p-4 text-white">
-          <div className="flex items-center gap-2">
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.reload();
+            }}
+            className="flex items-center gap-2"
+          >
             <Image
               src="https://neu.edu.ph/main/img/neu.png"
               alt="NEU Logo"
@@ -40,12 +47,12 @@ export default function LandingPage() {
               className="size-8"
             />
             <h1 className="text-2xl font-semibold">NEU Library</h1>
-          </div>
+          </a>
           <div className="flex items-center gap-4">
             <RealTimeClock />
             <Button
               variant="outline"
-              className="border-white text-white hover:bg-white/20"
+              className="border-white text-white hover:bg-black/10"
               onClick={() => router.push('/login')}
             >
               Log In
