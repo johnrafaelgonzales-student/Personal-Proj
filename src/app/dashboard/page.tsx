@@ -7,10 +7,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import {
   BookCopy,
-  BookOpenCheck,
   LayoutDashboard,
   PlusCircle,
   Settings,
@@ -90,7 +90,13 @@ export default function AdminDashboardPage() {
             }}
             className="flex items-center gap-2"
           >
-            <BookOpenCheck className="size-6 text-primary" />
+            <Image
+              src="https://neu.edu.ph/main/img/neu.png"
+              alt="NEU Logo"
+              width={24}
+              height={24}
+              className="size-6"
+            />
             <h1 className="text-lg font-semibold">NEU Library</h1>
           </a>
         </SidebarHeader>

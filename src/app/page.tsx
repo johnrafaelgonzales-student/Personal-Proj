@@ -7,7 +7,6 @@
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { BookOpenCheck } from 'lucide-react';
 import { RealTimeClock } from '@/components/real-time-clock';
 
 /**
@@ -17,12 +16,29 @@ export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen w-full bg-background text-foreground">
+    <div className="min-h-screen w-full text-foreground">
+      {/* Fixed background image */}
+      <Image
+        src="https://www.manilatimes.net/manilatimes/uploads/images/2021/11/24/29148.jpg"
+        alt="Library background"
+        fill
+        className="fixed inset-0 -z-10 object-cover"
+        priority
+        data-ai-hint="library building"
+      />
+      <div className="fixed inset-0 -z-10 bg-black/60 backdrop-blur-sm" />
+
       {/* Header */}
       <header className="sticky top-0 z-20 w-full bg-sky-600 shadow-md">
         <div className="container mx-auto flex items-center justify-between p-4 text-white">
           <div className="flex items-center gap-2">
-            <BookOpenCheck className="size-8 text-white" />
+            <Image
+              src="https://neu.edu.ph/main/img/neu.png"
+              alt="NEU Logo"
+              width={32}
+              height={32}
+              className="size-8"
+            />
             <h1 className="text-2xl font-semibold">NEU Library</h1>
           </div>
           <div className="flex items-center gap-4">
@@ -41,16 +57,7 @@ export default function LandingPage() {
       {/* Main Content */}
       <main className="relative z-10">
         {/* Welcome Section */}
-        <section className="relative flex h-[calc(100vh-68px)] flex-col items-center justify-center bg-gray-900 text-white">
-          <Image
-            src="https://www.manilatimes.net/manilatimes/uploads/images/2021/11/24/29148.jpg"
-            alt="Library background"
-            fill
-            className="object-cover"
-            priority
-            data-ai-hint="library building"
-          />
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+        <section className="relative flex h-[calc(100vh-68px)] flex-col items-center justify-center text-white">
           <div className="relative z-10 text-center">
             <h2 className="text-5xl font-bold md:text-7xl [text-shadow:0_0_12px_hsl(var(--primary))]">
               Welcome to the NEU Library
@@ -59,7 +66,7 @@ export default function LandingPage() {
         </section>
 
         {/* Description Section */}
-        <section className="bg-background py-20 lg:py-28">
+        <section className="bg-background/90 py-20 lg:py-28">
           <div className="container mx-auto grid grid-cols-1 items-center gap-12 md:grid-cols-2">
             <div className="flex justify-center">
               <Image
@@ -91,7 +98,7 @@ export default function LandingPage() {
         </section>
 
         {/* Features Sections */}
-        <section className="bg-muted py-20 lg:py-28">
+        <section className="bg-muted/90 py-20 lg:py-28">
           <div className="container mx-auto space-y-20">
             {/* Computer Room */}
             <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">

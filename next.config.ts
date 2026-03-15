@@ -66,6 +66,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'neu.edu.ph',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
