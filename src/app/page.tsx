@@ -1,20 +1,13 @@
 /**
  * @fileoverview This is the home page of the application.
- * It serves as a role selection screen, allowing the user to identify as either an Admin or a Visitor.
+ * It serves as a dynamic, multi-section landing page inspired by modern web design.
  */
 'use client';
 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
-import { User, Shield, BookOpenCheck } from 'lucide-react';
+import { BookOpenCheck } from 'lucide-react';
 import { RealTimeClock } from '@/components/real-time-clock';
 
 /**
@@ -23,53 +16,66 @@ import { RealTimeClock } from '@/components/real-time-clock';
 export default function LandingPage() {
   const router = useRouter();
 
-  /**
-   * Scrolls the view to the role selection section.
-   */
-  const scrollToRoleSelection = () => {
-    const section = document.getElementById('role-selection');
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <div className="relative min-h-screen w-full">
-      {/* Background Image and Overlay */}
-      <Image
-        src="https://www.manilatimes.net/manilatimes/uploads/images/2021/11/24/29148.jpg"
-        alt="Library background"
-        fill
-        className="object-cover"
-        priority
-        data-ai-hint="library building"
-      />
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-
+    <div className="min-h-screen w-full bg-background text-foreground">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-20 flex items-start justify-between p-4 text-white md:p-6">
-        <div className="flex items-center gap-2">
-          <BookOpenCheck className="size-8 text-white" />
-          <h1 className="text-2xl font-semibold">NEU Library</h1>
-        </div>
-        <div className="flex flex-col items-end gap-2">
-          <RealTimeClock />
-          <Button onClick={scrollToRoleSelection}>Log In</Button>
+      <header className="sticky top-0 z-20 w-full bg-sky-600 shadow-md">
+        <div className="container mx-auto flex items-center justify-between p-4 text-white">
+          <div className="flex items-center gap-2">
+            <BookOpenCheck className="size-8 text-white" />
+            <h1 className="text-2xl font-semibold">NEU Library</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <RealTimeClock />
+            <Button
+              variant="outline"
+              className="border-white text-white hover:bg-white/20"
+              onClick={() => router.push('/login')}
+            >
+              Log In
+            </Button>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-16 p-4 pt-40 pb-20 text-white md:pt-20">
-        {/* Welcome & Description Section */}
-        <div className="text-center">
-          <Card className="border-none bg-transparent shadow-none">
-            <CardHeader>
-              <CardTitle className="text-5xl font-bold md:text-7xl [text-shadow:0_0_12px_hsl(var(--primary))]">
-                Welcome to the NEU Library
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mt-4 text-lg text-primary-foreground/80 mx-auto max-w-4xl">
+      <main className="relative z-10">
+        {/* Welcome Section */}
+        <section className="relative flex h-[calc(100vh-68px)] flex-col items-center justify-center bg-gray-900 text-white">
+          <Image
+            src="https://www.manilatimes.net/manilatimes/uploads/images/2021/11/24/29148.jpg"
+            alt="Library background"
+            fill
+            className="object-cover"
+            priority
+            data-ai-hint="library building"
+          />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="relative z-10 text-center">
+            <h2 className="text-5xl font-bold md:text-7xl [text-shadow:0_0_12px_hsl(var(--primary))]">
+              Welcome to the NEU Library
+            </h2>
+          </div>
+        </section>
+
+        {/* Description Section */}
+        <section className="bg-background py-20 lg:py-28">
+          <div className="container mx-auto grid grid-cols-1 items-center gap-12 md:grid-cols-2">
+            <div className="flex justify-center">
+              <Image
+                src="https://img.freepik.com/free-vector/stack-colorful-books_1308-171744.jpg"
+                alt="Stack of colorful books"
+                width={400}
+                height={400}
+                className="rounded-lg"
+                data-ai-hint="books illustration"
+              />
+            </div>
+            <div className="space-y-4 text-center md:text-left">
+              <h3 className="text-3xl font-bold text-primary">
+                A Hub for Knowledge and Discovery
+              </h3>
+              <p className="text-lg text-muted-foreground">
                 The NEU Library is a modern hub for learning and collaboration.
                 It's a place for students to study in quiet focus, rest between
                 classes, discover new worlds through our extensive collection
@@ -80,39 +86,94 @@ export default function LandingPage() {
                 always available to assist with research and resource
                 navigation.
               </p>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </div>
+        </section>
 
-        {/* Role Selection Section */}
-        <div id="role-selection" className="w-full max-w-md">
-          <Card className="relative bg-background/80 backdrop-blur-md">
-            <CardHeader>
-              <CardTitle className="text-center text-3xl font-bold text-foreground">
-                Continue as...
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4 p-6">
-              <Button
-                size="lg"
-                className="w-full"
-                onClick={() => router.push('/login?role=admin')}
-              >
-                <Shield className="mr-2 h-5 w-5" />
-                Admin
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full border-primary text-primary hover:bg-primary/10"
-                onClick={() => router.push('/login?role=visitor')}
-              >
-                <User className="mr-2 h-5 w-5" />
-                Visitor
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Features Sections */}
+        <section className="bg-muted py-20 lg:py-28">
+          <div className="container mx-auto space-y-20">
+            {/* Computer Room */}
+            <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
+              <div className="space-y-4 text-center md:text-left">
+                <h3 className="text-3xl font-bold text-primary">
+                  Computer Room
+                </h3>
+                <p className="text-lg text-muted-foreground">
+                  Our state-of-the-art computer room provides students with
+                  access to high-speed internet and essential software for
+                  research, assignments, and creative projects. It's a quiet,
+                  focused environment perfect for completing homework, coding,
+                  or diving deep into online databases. We ensure all
+                  workstations are regularly updated and maintained to support
+                  your academic success.
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <Image
+                  src="https://media.istockphoto.com/id/1165294902/vector/desktop-computer-icon-flat-led-screen-monitor-pc-modern-personal-monitor-office-and-home.jpg?s=612x612&w=0&k=20&c=YtP0P84oPncvlV0JNTb2xNUWJ3lFoZwb03gsWwpLrW8="
+                  alt="Desktop Computer"
+                  width={400}
+                  height={400}
+                  className="rounded-lg bg-white p-4"
+                  data-ai-hint="computer icon"
+                />
+              </div>
+            </div>
+
+            {/* Lounge Room */}
+            <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
+              <div className="flex justify-center md:order-2">
+                <Image
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_tZf8Htz2nzpoBr4ya0kvQjolb6-MVYPrDw&s"
+                  alt="Lounge area with sofas"
+                  width={400}
+                  height={400}
+                  className="rounded-lg"
+                  data-ai-hint="lounge sofa"
+                />
+              </div>
+              <div className="space-y-4 text-center md:text-left md:order-1">
+                <h3 className="text-3xl font-bold text-primary">Lounge Room</h3>
+                <p className="text-lg text-muted-foreground">
+                  Need a break from studying? Our comfortable lounge room is the
+                  perfect spot to relax, socialize, and recharge. Grab a comfy
+                  seat, chat with friends, or even enjoy a quick mobile game.
+                  It's a casual space designed for student well-being,
+                  fostering connections and providing a necessary respite from
+                  academic pressures.
+                </p>
+              </div>
+            </div>
+
+            {/* Discussion Room */}
+            <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
+              <div className="space-y-4 text-center md:text-left">
+                <h3 className="text-3xl font-bold text-primary">
+                  Discussion Room
+                </h3>
+                <p className="text-lg text-muted-foreground">
+                  Collaborate effectively in our dedicated discussion rooms.
+                  These spaces are equipped with whiteboards and are ideal for
+                  group projects, study sessions, and brainstorming meetings.
+                  You can book a room to ensure your group has a private,
+                  productive environment to work on presentations, debate
+                  ideas, and achieve your collective academic goals.
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <Image
+                  src="https://media.istockphoto.com/id/1318577181/vector/flat-vector-illustration-of-school-classroom-whiteboard-with-black-marker-isolated-on-white.jpg?s=612x612&w=0&k=20&c=o-rgMCR8T9mdFX1j44ayW1es_AfAhSqd6VkM6_-FeS4="
+                  alt="Whiteboard for discussion"
+                  width={400}
+                  height={400}
+                  className="rounded-lg bg-white p-4"
+                  data-ai-hint="whiteboard illustration"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
