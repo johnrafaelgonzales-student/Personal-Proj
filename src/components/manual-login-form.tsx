@@ -218,25 +218,25 @@ export function ManualLoginForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Purpose of Visit</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a purpose" />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Research">Research</SelectItem>
-                            <SelectItem value="Study">Study</SelectItem>
-                            <SelectItem value="Borrow/Return">
-                              Borrow/Return
-                            </SelectItem>
-                            <SelectItem value="Event">Event</SelectItem>
-                            <SelectItem value="Other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Research">Research</SelectItem>
+                          <SelectItem value="Study">Study</SelectItem>
+                          <SelectItem value="Borrow/Return">
+                            Borrow/Return
+                          </SelectItem>
+                          <SelectItem value="Event">Event</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -267,38 +267,38 @@ export function ManualLoginForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>College Department/Office</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select your department/office" />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              <SelectLabel>Colleges</SelectLabel>
-                              {colleges.map((college) => (
-                                <SelectItem key={college} value={college}>
-                                  {college}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                            {Object.entries(offices).map(
-                              ([group, officeList]) => (
-                                <SelectGroup key={group}>
-                                  <SelectLabel>{group}</SelectLabel>
-                                  {officeList.map((office) => (
-                                    <SelectItem key={office} value={office}>
-                                      {office}
-                                    </SelectItem>
-                                  ))}
-                                </SelectGroup>
-                              )
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Colleges</SelectLabel>
+                            {colleges.map((college) => (
+                              <SelectItem key={college} value={college}>
+                                {college}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                          {Object.entries(offices).map(
+                            ([group, officeList]) => (
+                              <SelectGroup key={group}>
+                                <SelectLabel>{group}</SelectLabel>
+                                {officeList.map((office) => (
+                                  <SelectItem key={office} value={office}>
+                                    {office}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            )
+                          )}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -308,7 +308,7 @@ export function ManualLoginForm() {
             <Button type="submit" disabled={isSubmitting} className="w-full bg-primary hover:bg-primary/90">
               {isSubmitting ? <Loader2 className="animate-spin" /> : is_admin ? 'Log In' : 'Log Visit'}
             </Button>
-            <Button type="button" variant="ghost" className="w-full" onClick={() => router.back()}>
+            <Button type="button" variant="ghost" className="w-full" onClick={() => router.push('/')}>
                 Cancel
             </Button>
           </form>

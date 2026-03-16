@@ -52,6 +52,14 @@ function RoleSelection() {
           <User className="mr-2 h-5 w-5" />
           Visitor
         </Button>
+        <Button
+          size="lg"
+          variant="ghost"
+          className="w-full"
+          onClick={() => router.push('/')}
+        >
+          Cancel
+        </Button>
       </CardContent>
     </Card>
   );

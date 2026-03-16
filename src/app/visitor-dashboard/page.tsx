@@ -6,10 +6,8 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
-import { LogOut } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 
 import {
@@ -20,13 +18,13 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { VisitorHistoryTable } from '@/components/visitor-history-table';
-import { Button } from '@/components/ui/button';
 
 /**
  * The main content of the visitor welcome page. It extracts user info from URL search parameters.
  */
 function VisitorDashboardContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const name = searchParams.get('name') || 'Visitor';
   const college = searchParams.get('college') || 'N/A';
   const [loginTime, setLoginTime] = useState<Date | null>(null);
@@ -34,7 +32,15 @@ function VisitorDashboardContent() {
   useEffect(() => {
     // Set the login time once on the client to avoid hydration mismatch.
     setLoginTime(new Date());
-  }, []);
+
+    // Automatically redirect to the home page after 5 seconds.
+    const timer = setTimeout(() => {
+      router.push('/');
+    }, 5000);
+
+    // Clean up the timer when the component unmounts.
+    return () => clearTimeout(timer);
+  }, [router]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -56,15 +62,6 @@ function VisitorDashboardContent() {
           />
           <h1 className="text-lg font-semibold">NEU Library</h1>
         </a>
-
-        <div className="flex items-center gap-4">
-          <Link href="/">
-            <Button variant="outline">
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
-          </Link>
-        </div>
       </header>
       <main className="flex flex-1 items-center justify-center p-4 sm:px-6 md:p-8">
         <Card className="w-full max-w-4xl">
