@@ -29,6 +29,7 @@ import {
   SidebarMenuButton,
   SidebarInset,
   SidebarFooter,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { ManualEntryForm } from '@/components/manual-entry-form';
@@ -79,7 +80,7 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <Sidebar>
         <SidebarHeader>
           <a
@@ -150,7 +151,10 @@ export default function AdminDashboardPage() {
       </Sidebar>
       <SidebarInset>
         <header className="flex h-14 items-center justify-between border-b bg-background/95 px-4 lg:px-6">
-          <h2 className="text-xl font-semibold">{getHeaderTitle()}</h2>
+          <div className="flex items-center gap-4">
+            <SidebarTrigger />
+            <h2 className="text-xl font-semibold">{getHeaderTitle()}</h2>
+          </div>
           <div className="flex items-center gap-4">
             <ManualEntryForm>
               <Button>
