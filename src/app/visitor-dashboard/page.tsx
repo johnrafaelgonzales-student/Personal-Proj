@@ -33,10 +33,10 @@ function VisitorDashboardContent() {
     // Set the login time once on the client to avoid hydration mismatch.
     setLoginTime(new Date());
 
-    // Automatically redirect to the login page after 5 seconds.
+    // Automatically redirect to the login page after 10 seconds.
     const timer = setTimeout(() => {
       router.push('/login');
-    }, 5000);
+    }, 10000);
 
     // Clean up the timer when the component unmounts.
     return () => clearTimeout(timer);
