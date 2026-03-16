@@ -66,7 +66,6 @@ import type { Visitor } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 const PAGE_SIZE = 10;
-const purposes = ['Research', 'Study', 'Borrow/Return', 'Event', 'Other'];
 const staffDepartments = Object.values(offices).flat();
 
 /**
@@ -97,6 +96,11 @@ export function VisitorLogTable() {
       window.removeEventListener('focus', loadData);
     };
   }, []);
+
+  const purposes = React.useMemo(() => {
+    const allPurposes = data.map((visitor) => visitor.purpose);
+    return [...new Set(allPurposes)].sort();
+  }, [data]);
 
   // Reset page to 1 when filters change
   React.useEffect(() => {
