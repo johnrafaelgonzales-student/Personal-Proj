@@ -107,6 +107,7 @@ export default function AdminDashboardPage() {
               <SidebarMenuButton
                 onClick={() => setActiveAdminView('dashboard')}
                 isActive={activeAdminView === 'dashboard'}
+                closeSidebarOnClick
               >
                 <LayoutDashboard />
                 <span>Dashboard</span>
@@ -116,6 +117,7 @@ export default function AdminDashboardPage() {
               <SidebarMenuButton
                 onClick={() => setActiveAdminView('log')}
                 isActive={activeAdminView === 'log'}
+                closeSidebarOnClick
               >
                 <BookCopy />
                 <span>Visitor Log</span>
@@ -170,12 +172,12 @@ export default function AdminDashboardPage() {
                   className="overflow-hidden rounded-full h-8 w-8"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback>GR</AvatarFallback>
+                    <AvatarFallback>EJ</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Gonzales, Rafael</DropdownMenuLabel>
+                <DropdownMenuLabel>Esperanza, Jeremias</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <Link href="/">
                   <DropdownMenuItem>

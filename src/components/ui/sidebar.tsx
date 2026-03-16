@@ -278,7 +278,9 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, isMobile, open, openMobile } = useSidebar()
+  const isOpen = isMobile ? openMobile : open
+
   return (
     <Button
       ref={ref}
@@ -292,7 +294,12 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <Menu />
+      <Menu
+        className={cn(
+          "transition-transform duration-300",
+          isOpen && "rotate-90"
+        )}
+      />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
@@ -407,6 +414,7 @@ const SidebarMenuButton = React.forwardRef<
     asChild?: boolean
     isActive?: boolean
     tooltip?: string | React.ComponentProps<typeof TooltipContent>
+    closeSidebarOnClick?: boolean
   } & VariantProps<typeof sidebarMenuButtonVariants>
 >(
   (
@@ -417,12 +425,25 @@ const SidebarMenuButton = React.forwardRef<
       size = "default",
       tooltip,
       className,
+      closeSidebarOnClick = false,
+      onClick,
       ...props
     },
     ref
   ) => {
     const Comp = asChild ? Slot : "button"
-    const { isMobile, state } = useSidebar()
+    const { isMobile, state, setOpen, setOpenMobile } = useSidebar()
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      onClick?.(event)
+      if (closeSidebarOnClick) {
+        if (isMobile) {
+          setOpenMobile(false)
+        } else {
+          setOpen(false)
+        }
+      }
+    }
 
     const button = (
       <Comp
@@ -431,6 +452,7 @@ const SidebarMenuButton = React.forwardRef<
         data-size={size}
         data-active={isActive}
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+        onClick={handleClick}
         {...props}
       />
     )

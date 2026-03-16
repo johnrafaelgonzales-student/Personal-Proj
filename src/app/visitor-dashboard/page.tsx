@@ -35,7 +35,7 @@ function VisitorDashboardContent() {
 
     // Automatically redirect to the home page after 5 seconds.
     const timer = setTimeout(() => {
-      router.push('/');
+      router.push('/login');
     }, 5000);
 
     // Clean up the timer when the component unmounts.
