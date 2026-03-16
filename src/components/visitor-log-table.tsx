@@ -39,7 +39,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
   Table,
@@ -67,6 +71,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const PAGE_SIZE = 10;
 const staffDepartments = Object.values(offices).flat();
+const standardPurposes = ['Research', 'Study', 'Borrow/Return', 'Event'];
 
 /**
  * The main component for the admin's visitor log table.
@@ -97,9 +102,12 @@ export function VisitorLogTable() {
     };
   }, []);
 
-  const purposes = React.useMemo(() => {
+  const customPurposes = React.useMemo(() => {
     const allPurposes = data.map((visitor) => visitor.purpose);
-    return [...new Set(allPurposes)].sort();
+    const uniquePurposes = [...new Set(allPurposes)];
+    return uniquePurposes
+      .filter((p) => !standardPurposes.includes(p))
+      .sort();
   }, [data]);
 
   // Reset page to 1 when filters change
@@ -172,19 +180,44 @@ export function VisitorLogTable() {
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Select value={purposeFilter} onValueChange={setPurposeFilter}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Filter by purpose" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Purposes</SelectItem>
-                  {purposes.map((purpose) => (
-                    <SelectItem key={purpose} value={purpose}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full sm:w-[180px] justify-start">
+                    {purposeFilter === 'all'
+                      ? 'Filter by purpose'
+                      : purposeFilter}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onSelect={() => setPurposeFilter('all')}>
+                    All Purposes
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {standardPurposes.map((purpose) => (
+                    <DropdownMenuItem
+                      key={purpose}
+                      onSelect={() => setPurposeFilter(purpose)}
+                    >
                       {purpose}
-                    </SelectItem>
+                    </DropdownMenuItem>
                   ))}
-                </SelectContent>
-              </Select>
+                  {customPurposes.length > 0 && (
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>Other</DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent>
+                        {customPurposes.map((purpose) => (
+                          <DropdownMenuItem
+                            key={purpose}
+                            onSelect={() => setPurposeFilter(purpose)}
+                          >
+                            {purpose}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Select value={userTypeFilter} onValueChange={setUserTypeFilter}>
                 <SelectTrigger className="w-full sm:w-[180px]">
                   <SelectValue placeholder="Filter by user type" />
