@@ -225,7 +225,7 @@ export function VisitorLogTable() {
                 <SelectContent>
                   <SelectItem value="all">All User Types</SelectItem>
                   <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="staff">Staff/Employee</SelectItem>
+                  <SelectItem value="staff">Teacher/Employee</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -239,6 +239,7 @@ export function VisitorLogTable() {
                   <span className="sr-only">Image</span>
                 </TableHead>
                 <TableHead>Name</TableHead>
+                <TableHead>User Type</TableHead>
                 <TableHead>Purpose</TableHead>
                 <TableHead className="hidden md:table-cell">
                   College/Office
@@ -278,6 +279,11 @@ export function VisitorLogTable() {
                           <Badge variant="destructive">Blocked</Badge>
                         )}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {colleges.includes(visitor.college)
+                        ? 'Student'
+                        : 'Teacher/Employee'}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{visitor.purpose}</Badge>
@@ -346,7 +352,7 @@ export function VisitorLogTable() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={8}
                     className="h-24 text-center text-muted-foreground"
                   >
                     <div className="flex flex-col items-center gap-2">
