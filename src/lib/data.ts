@@ -62,7 +62,20 @@ const getRandomDate = (): Date => {
  */
 export const generateMockVisitors = (count: number): Visitor[] => {
   const visitors: Visitor[] = [];
-  for (let i = 0; i < count; i++) {
+
+  // Add a specific entry for the custom purpose requested.
+  visitors.push({
+    id: `vis-custom-fthw`,
+    name: 'Alex Ray',
+    purpose: 'finding the hard way',
+    entryTime: new Date(),
+    entryType: 'manual',
+    avatarUrl: `https://picsum.photos/seed/findinghardway/100/100`,
+    college: 'College of Arts and Sciences',
+    blocked: false,
+  });
+
+  for (let i = 1; i < count; i++) {
     const firstName = getRandomElement(firstNames);
     const lastName = getRandomElement(lastNames);
     visitors.push({
