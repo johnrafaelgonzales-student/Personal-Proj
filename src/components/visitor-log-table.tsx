@@ -49,11 +49,25 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { getVisitorsFromStore, toggleVisitorBlockStatus } from '@/lib/data';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  getVisitorsFromStore,
+  toggleVisitorBlockStatus,
+  colleges,
+  offices,
+} from '@/lib/data';
 import type { Visitor } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 const PAGE_SIZE = 10;
+const purposes = ['Research', 'Study', 'Borrow/Return', 'Event', 'Other'];
+const staffDepartments = Object.values(offices).flat();
 
 /**
  * The main component for the admin's visitor log table.
@@ -69,6 +83,10 @@ export function VisitorLogTable() {
     null
   );
 
+  // State for filters
+  const [purposeFilter, setPurposeFilter] = React.useState('all');
+  const [userTypeFilter, setUserTypeFilter] = React.useState('all');
+
   // Effect to load data from local storage on mount and on window focus.
   React.useEffect(() => {
     const loadData = () => setData(getVisitorsFromStore());
@@ -80,11 +98,33 @@ export function VisitorLogTable() {
     };
   }, []);
 
+  // Reset page to 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [purposeFilter, userTypeFilter]);
+
+  const filteredData = React.useMemo(() => {
+    return data.filter((visitor) => {
+      const purposeMatch =
+        purposeFilter === 'all' || visitor.purpose === purposeFilter;
+
+      const isStudent = colleges.includes(visitor.college);
+      const isStaff = staffDepartments.includes(visitor.college);
+
+      const userTypeMatch =
+        userTypeFilter === 'all' ||
+        (userTypeFilter === 'student' && isStudent) ||
+        (userTypeFilter === 'staff' && isStaff);
+
+      return purposeMatch && userTypeMatch;
+    });
+  }, [data, purposeFilter, userTypeFilter]);
+
   // Pagination calculations.
-  const totalPages = Math.ceil(data.length / PAGE_SIZE);
+  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const endIndex = startIndex + PAGE_SIZE;
-  const currentData = data.slice(startIndex, endIndex);
+  const currentData = filteredData.slice(startIndex, endIndex);
 
   const handleNextPage = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
@@ -120,10 +160,39 @@ export function VisitorLogTable() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Visitors</CardTitle>
-          <CardDescription>
-            A log of all recent visitor entries.
-          </CardDescription>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <CardTitle>Visitors</CardTitle>
+              <CardDescription>
+                A log of all recent visitor entries.
+              </CardDescription>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Select value={purposeFilter} onValueChange={setPurposeFilter}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by purpose" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Purposes</SelectItem>
+                  {purposes.map((purpose) => (
+                    <SelectItem key={purpose} value={purpose}>
+                      {purpose}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={userTypeFilter} onValueChange={setUserTypeFilter}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by user type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All User Types</SelectItem>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="staff">Staff/Employee</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -259,10 +328,10 @@ export function VisitorLogTable() {
             <div>
               Showing{' '}
               <strong>
-                {Math.min(startIndex + 1, data.length)}-
-                {Math.min(endIndex, data.length)}
+                {Math.min(startIndex + 1, filteredData.length)}-
+                {Math.min(endIndex, filteredData.length)}
               </strong>{' '}
-              of <strong>{data.length}</strong> visitors
+              of <strong>{filteredData.length}</strong> visitors
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -278,7 +347,7 @@ export function VisitorLogTable() {
                 variant="outline"
                 size="sm"
                 onClick={handleNextPage}
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || totalPages === 0}
               >
                 <ChevronRight className="h-4 w-4" />
                 <span className="sr-only">Next</span>
@@ -295,7 +364,9 @@ export function VisitorLogTable() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{selectedVisitor?.name}</DialogTitle>
-            <DialogDescription>Details for the visitor entry.</DialogDescription>
+            <DialogDescription>
+              Details for the visitor entry.
+            </DialogDescription>
           </DialogHeader>
           {selectedVisitor && (
             <div className="grid gap-2 py-4 text-sm">
