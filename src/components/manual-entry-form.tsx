@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { addVisitorToStore, colleges, offices } from '@/lib/data';
 
@@ -51,9 +52,14 @@ const formSchema = z
       .refine((email) => email.endsWith('@neu.edu.ph'), {
         message: 'Please use an institutional @neu.edu.ph email.',
       }),
+    userType: z.enum(['student', 'teacher'], {
+      required_error: 'You need to select a user type.',
+    }),
     purpose: z.enum(['Research', 'Study', 'Borrow/Return', 'Event', 'Other']),
     otherPurpose: z.string().optional(),
-    college: z.string({ required_error: 'Please select a college/office.' }),
+    collegeOrOffice: z.string({
+      required_error: 'Please select a department/office.',
+    }),
   })
   .refine(
     (data) => {
@@ -103,13 +109,15 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
+      userType: undefined,
       purpose: 'Study',
-      college: undefined,
+      collegeOrOffice: undefined,
       otherPurpose: '',
     },
   });
 
   const purposeValue = form.watch('purpose');
+  const userTypeValue = form.watch('userType');
 
   /**
    * Handles the form submission.
@@ -117,7 +125,7 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
    */
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    
+
     // Derives the name from the email.
     const derivedName = emailToName(values.email);
     const finalPurpose =
@@ -127,7 +135,7 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
     addVisitorToStore({
       name: derivedName,
       purpose: finalPurpose,
-      college: values.college,
+      college: values.collegeOrOffice,
     });
 
     // Simulate network delay.
@@ -138,7 +146,7 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
     form.reset();
     toast({
       title: 'Success!',
-      description: `Visitor "${derivedName}" from ${values.college} has been logged successfully.`,
+      description: `Visitor "${derivedName}" from ${values.collegeOrOffice} has been logged successfully.`,
     });
   }
 
@@ -175,6 +183,100 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
                 </FormItem>
               )}
             />
+
+            {/* User Type Radio Group */}
+            <FormField
+              control={form.control}
+              name="userType"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>User is a...</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex space-x-4"
+                    >
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="student" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Student</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="teacher" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Teacher/Employee
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Conditional College/Office Select Field */}
+            {userTypeValue && (
+              <FormField
+                control={form.control}
+                name="collegeOrOffice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {userTypeValue === 'student'
+                        ? 'College Department'
+                        : 'Office'}
+                    </FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={`Select a ${
+                              userTypeValue === 'student'
+                                ? 'department'
+                                : 'office'
+                            }`}
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {userTypeValue === 'student' ? (
+                            <SelectGroup>
+                              <SelectLabel>Colleges</SelectLabel>
+                              {colleges.map((college) => (
+                                <SelectItem key={college} value={college}>
+                                  {college}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          ) : (
+                            Object.entries(offices).map(
+                              ([group, officeList]) => (
+                                <SelectGroup key={group}>
+                                  <SelectLabel>{group}</SelectLabel>
+                                  {officeList.map((office) => (
+                                    <SelectItem key={office} value={office}>
+                                      {office}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              )
+                            )
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             {/* Purpose of Visit Select Field */}
             <FormField
               control={form.control}
@@ -223,47 +325,6 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
               />
             )}
 
-            {/* College/Office Select Field */}
-            <FormField
-              control={form.control}
-              name="college"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>College Department/Office</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a department/office" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Colleges</SelectLabel>
-                          {colleges.map((college) => (
-                            <SelectItem key={college} value={college}>
-                              {college}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                        {Object.entries(offices).map(([group, officeList]) => (
-                          <SelectGroup key={group}>
-                            <SelectLabel>{group}</SelectLabel>
-                            {officeList.map((office) => (
-                              <SelectItem key={office} value={office}>
-                                {office}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <DialogFooter className="pt-4">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
