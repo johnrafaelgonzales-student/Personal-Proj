@@ -38,7 +38,7 @@ function RoleSelection() {
         <Button
           size="lg"
           variant="outline"
-          className="w-full border-primary text-primary hover:bg-primary/10"
+          className="w-full border-white text-white hover:bg-black/10"
           onClick={() => router.push('/login?role=admin')}
         >
           <Shield className="mr-2 h-5 w-5" />

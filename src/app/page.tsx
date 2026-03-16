@@ -51,8 +51,6 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             <RealTimeClock />
             <Button
-              variant="outline"
-              className="border-white text-white hover:bg-black/10"
               onClick={() => router.push('/login')}
             >
               Log In

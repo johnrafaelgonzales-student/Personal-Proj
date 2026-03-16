@@ -94,8 +94,8 @@ export function ManualLoginForm() {
       const adminValues = values as z.infer<typeof adminSchema>;
       // Hardcoded credentials for the admin.
       if (
-        adminValues.email === 'johnrafael.gonzales@neu.edu.ph' &&
-        adminValues.password === 'Akobossdto23'
+        adminValues.email === 'jcesperanza@neu.edu.ph' &&
+        adminValues.password === 'adminsisir123'
       ) {
         console.log('Admin login successful:', values);
         router.push('/dashboard');
