@@ -1,62 +1,44 @@
 /**
- * @fileoverview This page displays the dashboard for a logged-in visitor.
- * It shows a welcome message and a table of the visitor's past library visits.
+ * @fileoverview This page serves as a welcome screen for a logged-in visitor.
+ * It displays their name, college, login time, and a table of their past library visits,
+ * all within a single, clean card layout.
  */
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { LogOut } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
+
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { VisitorHistoryTable } from '@/components/visitor-history-table';
-import { mockUser } from '@/lib/data';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 /**
- * The main content of the visitor dashboard. It extracts user info from URL search parameters.
+ * The main content of the visitor welcome page. It extracts user info from URL search parameters.
  */
 function VisitorDashboardContent() {
   const searchParams = useSearchParams();
-  // Get the visitor's name and college from the URL, with fallbacks.
-  const name = searchParams.get('name') || mockUser.name;
-  const college = searchParams.get('college') || '';
+  const name = searchParams.get('name') || 'Visitor';
+  const college = searchParams.get('college') || 'N/A';
+  const [loginTime, setLoginTime] = useState<Date | null>(null);
 
-  // Utility function to generate initials from a name string for the avatar fallback.
-  const getInitials = (nameStr: string) => {
-    const cleanedName = nameStr.replace(',', '');
-    const parts = cleanedName.split(' ').filter(Boolean);
-    if (parts.length > 1) {
-      const firstInitial = parts[0][0] || '';
-      const lastInitial = parts[parts.length - 1][0] || '';
-      return `${firstInitial}${lastInitial}`.toUpperCase();
-    }
-    if (parts.length === 1 && parts[0].length > 1) {
-      return parts[0].substring(0, 2).toUpperCase();
-    }
-    return '??';
-  };
-
-  const initials = getInitials(name);
+  useEffect(() => {
+    // Set the login time once on the client to avoid hydration mismatch.
+    setLoginTime(new Date());
+  }, []);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
         <a
           href="#"
           onClick={(e) => {
@@ -76,50 +58,67 @@ function VisitorDashboardContent() {
         </a>
 
         <div className="flex items-center gap-4">
-          <span className="text-sm font-medium">{name}</span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="overflow-hidden rounded-full"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src={mockUser.avatarUrl}
-                    alt="Visitor Avatar"
-                    data-ai-hint="person portrait"
-                  />
-                  <AvatarFallback>{initials}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <Link href="/">
-                <DropdownMenuItem>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </DropdownMenuItem>
-              </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Link href="/">
+            <Button variant="outline">
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          </Link>
         </div>
       </header>
-      <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-        <div className="space-y-4 pt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Welcome, {name}!</CardTitle>
-              <CardDescription>
-                Here's a summary of your recent library visits.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-          {/* Renders the table with the visitor's specific history. */}
-          <VisitorHistoryTable visitorName={name} college={college} />
-        </div>
+      <main className="flex flex-1 items-center justify-center p-4 sm:px-6 md:p-8">
+        <Card className="w-full max-w-4xl">
+          <CardHeader>
+            <CardTitle className="text-2xl">Welcome to NEU Library</CardTitle>
+            <CardDescription>
+              Your visit has been successfully logged.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Section for visitor's current login details. */}
+            <div className="grid gap-2 rounded-md border p-4 text-sm">
+              <div className="grid grid-cols-[150px_1fr] items-center gap-4">
+                <p className="font-medium text-muted-foreground">Name:</p>
+                <p className="font-semibold">{name}</p>
+              </div>
+              <div className="grid grid-cols-[150px_1fr] items-center gap-4">
+                <p className="font-medium text-muted-foreground">
+                  Department/Office:
+                </p>
+                <p className="font-semibold">{college}</p>
+              </div>
+              <div className="grid grid-cols-[150px_1fr] items-center gap-4">
+                <p className="font-medium text-muted-foreground">Date:</p>
+                {loginTime ? (
+                  <p>{format(loginTime, 'MMMM dd, yyyy')}</p>
+                ) : (
+                  <div className="h-5 w-32 animate-pulse rounded-md bg-muted" />
+                )}
+              </div>
+              <div className="grid grid-cols-[150px_1fr] items-center gap-4">
+                <p className="font-medium text-muted-foreground">
+                  Login Time:
+                </p>
+                {loginTime ? (
+                  <p>{format(loginTime, 'h:mm:ss a')}</p>
+                ) : (
+                  <div className="h-5 w-24 animate-pulse rounded-md bg-muted" />
+                )}
+              </div>
+            </div>
+
+            {/* Section for the visitor's complete history. */}
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold">Your Visit History</h3>
+                <p className="text-sm text-muted-foreground">
+                  A log of your recent visits to the library.
+                </p>
+              </div>
+              <VisitorHistoryTable visitorName={name} college={college} />
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
