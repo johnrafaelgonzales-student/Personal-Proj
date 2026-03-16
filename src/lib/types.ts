@@ -4,7 +4,7 @@
  */
 
 // Defines the possible purposes for a library visit.
-export type VisitorPurpose = 'Research' | 'Study' | 'Borrow/Return' | 'Event' | 'Other';
+export type VisitorPurpose = string;
 // Defines the possible methods of entry.
 export type EntryType = 'manual' | 'rfid' | 'email';
 

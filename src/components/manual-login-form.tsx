@@ -25,17 +25,31 @@ const adminSchema = z.object({
 });
 
 // Zod schema for visitor login validation.
-const visitorSchema = z.object({
-  email: z
-    .string()
-    .email({ message: 'Please enter a valid email.' })
-    // Custom validation to ensure it's an institutional email.
-    .refine((email) => email.endsWith('@neu.edu.ph'), {
-      message: 'Please use your institutional @neu.edu.ph email.',
-    }),
-  purpose: z.enum(['Research', 'Study', 'Borrow/Return', 'Event', 'Other']),
-  college: z.string({ required_error: 'Please select a college/office.' }),
-});
+const visitorSchema = z
+  .object({
+    email: z
+      .string()
+      .email({ message: 'Please enter a valid email.' })
+      // Custom validation to ensure it's an institutional email.
+      .refine((email) => email.endsWith('@neu.edu.ph'), {
+        message: 'Please use your institutional @neu.edu.ph email.',
+      }),
+    purpose: z.enum(['Research', 'Study', 'Borrow/Return', 'Event', 'Other']),
+    otherPurpose: z.string().optional(),
+    college: z.string({ required_error: 'Please select a college/office.' }),
+  })
+  .refine(
+    (data) => {
+      if (data.purpose === 'Other') {
+        return !!data.otherPurpose && data.otherPurpose.trim().length > 0;
+      }
+      return true;
+    },
+    {
+      message: 'Please specify the purpose.',
+      path: ['otherPurpose'],
+    }
+  );
 
 /**
  * The main component for the manual login form.
@@ -53,9 +67,17 @@ export function ManualLoginForm() {
   // Initialize React Hook Form with the correct schema and default values.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: is_admin ? { email: '', password: '' } : { email: '', purpose: 'Study', college: undefined },
+    defaultValues: is_admin
+      ? { email: '', password: '' }
+      : {
+          email: '',
+          purpose: 'Study',
+          college: undefined,
+          otherPurpose: '',
+        },
   });
 
+  const purposeValue = form.watch('purpose');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   /**
@@ -104,11 +126,15 @@ export function ManualLoginForm() {
       };
       
       const derivedName = emailToName(visitorValues.email);
+      const finalPurpose =
+        visitorValues.purpose === 'Other'
+          ? visitorValues.otherPurpose!
+          : visitorValues.purpose;
 
       // Add the new visitor to the local storage "database".
       addVisitorToStore({ 
         name: derivedName, 
-        purpose: visitorValues.purpose, 
+        purpose: finalPurpose, 
         college: visitorValues.college 
       });
 
@@ -215,6 +241,26 @@ export function ManualLoginForm() {
                     </FormItem>
                   )}
                 />
+                
+                {purposeValue === 'Other' && (
+                  <FormField
+                    control={form.control}
+                    name="otherPurpose"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Please specify purpose</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Attend Seminar"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
                 <FormField
                   control={form.control}
                   name="college"

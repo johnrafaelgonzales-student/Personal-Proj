@@ -42,17 +42,31 @@ import { useToast } from '@/hooks/use-toast';
 import { addVisitorToStore, colleges, offices } from '@/lib/data';
 
 // Zod schema for form validation.
-const formSchema = z.object({
-  email: z
-    .string()
-    .email({ message: 'Please enter a valid email.' })
-    // Ensures the email is an institutional one.
-    .refine((email) => email.endsWith('@neu.edu.ph'), {
-      message: 'Please use an institutional @neu.edu.ph email.',
-    }),
-  purpose: z.enum(['Research', 'Study', 'Borrow/Return', 'Event', 'Other']),
-  college: z.string({ required_error: 'Please select a college/office.' }),
-});
+const formSchema = z
+  .object({
+    email: z
+      .string()
+      .email({ message: 'Please enter a valid email.' })
+      // Ensures the email is an institutional one.
+      .refine((email) => email.endsWith('@neu.edu.ph'), {
+        message: 'Please use an institutional @neu.edu.ph email.',
+      }),
+    purpose: z.enum(['Research', 'Study', 'Borrow/Return', 'Event', 'Other']),
+    otherPurpose: z.string().optional(),
+    college: z.string({ required_error: 'Please select a college/office.' }),
+  })
+  .refine(
+    (data) => {
+      if (data.purpose === 'Other') {
+        return !!data.otherPurpose && data.otherPurpose.trim().length > 0;
+      }
+      return true;
+    },
+    {
+      message: 'Please specify the purpose.',
+      path: ['otherPurpose'],
+    }
+  );
 
 /**
  * Converts an email like "juan.delacruz@neu.edu.ph" to "Delacruz, Juan".
@@ -91,8 +105,11 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
       email: '',
       purpose: 'Study',
       college: undefined,
+      otherPurpose: '',
     },
   });
+
+  const purposeValue = form.watch('purpose');
 
   /**
    * Handles the form submission.
@@ -103,10 +120,13 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
     
     // Derives the name from the email.
     const derivedName = emailToName(values.email);
+    const finalPurpose =
+      values.purpose === 'Other' ? values.otherPurpose! : values.purpose;
+
     // Adds the new visitor entry to the local storage "database".
     addVisitorToStore({
       name: derivedName,
-      purpose: values.purpose,
+      purpose: finalPurpose,
       college: values.college,
     });
 
@@ -185,6 +205,24 @@ export function ManualEntryForm({ children }: { children: React.ReactNode }) {
                 </FormItem>
               )}
             />
+
+            {/* Conditional "Other Purpose" Input Field */}
+            {purposeValue === 'Other' && (
+              <FormField
+                control={form.control}
+                name="otherPurpose"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Please specify purpose</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Attend Seminar" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             {/* College/Office Select Field */}
             <FormField
               control={form.control}
