@@ -37,7 +37,8 @@ function RoleSelection() {
       <CardContent className="flex flex-col gap-4 p-6">
         <Button
           size="lg"
-          className="w-full"
+          variant="outline"
+          className="w-full border-primary text-primary hover:bg-primary/10"
           onClick={() => router.push('/login?role=admin')}
         >
           <Shield className="mr-2 h-5 w-5" />
@@ -45,8 +46,7 @@ function RoleSelection() {
         </Button>
         <Button
           size="lg"
-          variant="outline"
-          className="w-full border-primary text-primary hover:bg-primary/10"
+          className="w-full"
           onClick={() => router.push('/login?role=visitor')}
         >
           <User className="mr-2 h-5 w-5" />
