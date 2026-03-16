@@ -1,6 +1,6 @@
 /**
- * @fileoverview This page is for users who choose the "Manual Entry" login option.
- * It displays a form for either an admin or a visitor to enter their details.
+ * @fileoverview This page is for admins who choose the "Manual Entry" login option.
+ * It displays a form for an admin to enter their credentials.
  */
 'use client';
 import { Suspense } from 'react';
@@ -15,11 +15,11 @@ function ManualLoginPageContent() {
         <div className="relative flex h-screen w-full items-center justify-center">
             {/* Background image for the manual login screen. */}
              <Image
-                src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=2070&auto=format&fit=crop"
-                alt="Person reading in a library"
+                src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2128&auto=format&fit=crop"
+                alt="Library background"
                 fill
                 className="object-cover"
-                data-ai-hint="person reading"
+                data-ai-hint="library books"
             />
             {/* A semi-transparent overlay to darken the background image. */}
             <div className="absolute inset-0 bg-black/60" />

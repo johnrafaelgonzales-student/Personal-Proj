@@ -20,23 +20,22 @@ export function LoginOptions() {
 
   /**
    * Handles the simulated RFID login.
-   * Redirects the user to the appropriate dashboard based on their role.
+   * Redirects the user to the RFID tap simulation page.
    */
   const handleRfidLogin = () => {
-    // This is a simulation. In a real app, this would involve an RFID reader.
-    if (role === 'admin') {
-      router.push('/dashboard');
-    } else {
-      router.push('/visitor-dashboard');
-    }
+    router.push(`/rfid-tap?role=${role}`);
   };
 
   /**
    * Handles the manual entry login.
-   * Redirects the user to the manual login form, preserving their role.
+   * Redirects the user to the correct manual login flow based on their role.
    */
   const handleManualEntry = () => {
-    router.push(`/manual-login?role=${role}`);
+    if (role === 'admin') {
+      router.push(`/manual-login?role=${role}`);
+    } else {
+      router.push('/visitor-email-entry');
+    }
   };
 
   return (
@@ -62,9 +61,9 @@ export function LoginOptions() {
           size="lg"
           variant="ghost"
           className="w-full"
-          onClick={() => router.push('/')}
+          onClick={() => router.push('/login')}
         >
-          Cancel
+          &lt;-- Back
         </Button>
       </CardContent>
     </Card>

@@ -58,7 +58,7 @@ function RoleSelection() {
           className="w-full"
           onClick={() => router.push('/')}
         >
-          Cancel
+          &lt;-- Back
         </Button>
       </CardContent>
     </Card>
